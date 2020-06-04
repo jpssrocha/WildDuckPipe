@@ -7,7 +7,7 @@ The final goal is to have a framework on which will be possible to take the orig
 an observing run and have back the final results (reduced images, photometry tables, calibrations
 and so on) with a simple command.
 
-#Tools to integrate:
+# Tools to integrate:
 
 ## Image processing tools;
 
