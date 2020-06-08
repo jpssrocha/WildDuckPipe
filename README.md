@@ -1,5 +1,7 @@
 # Wild Duck Pipe
 
+**UNDER CONSTRUCTION**
+
 This project was started by the necessity of a framework that allows data reduction and analysis
 inside Python, being able to taking advantage of the language's flexibility.
 
