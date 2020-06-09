@@ -1,7 +1,6 @@
 """
-Biblioteca com funções relacionadas a redução imagens astronômicas em grande
-quantidade seguindo o padrão adotado na missão de observação OI2018B-011 do
-OPD/LNA.
+Library containing functions related to the reduction of astronomical images.
+Optimized to use with the standard adopted on mission OI2018B-011 from OPD/LNA
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,20 +10,28 @@ from astropy.io import fits
 from datetime import datetime as dt
 import astroalign
 
-# 1. Funções para lidar com movimentação e organização de arquivos
+# File movementation functions
 
 
-def move_files(arquivos, destino):
+def move_files(files, destination):
     """
-    Move lista de arquivos para o destino especificado
+    Move list of files to specified destination.
+
+    Args:
+        files -- List object containing strings with the address of files.
+        destination -- String containing destination folder.
+
+    Return:
+        None -- Just move files
     """
-    quantidade = len(arquivos)
-    print("Movendo", quantidade, "arquivos... \n")
+    quantity = len(files)
+    print("Moving", quantity, "files... \n")
+
     i = 1
-    for arquivo in arquivos:
+    for file in files:
         print("%s ====> %s/%s (%i de %i)" %
-              (arquivo, destino, arquivo, i, quantidade))
-        os.rename(arquivo, destino + "/" + arquivo)
+              (file, destination, file, i, quantity))
+        os.rename(file, destination + "/" + file)
         i += 1
     print("\n")
 
@@ -177,7 +184,7 @@ def make_MasterBias(bias_folder, out_folder):
     current_folder = os.getcwd()
     os.chdir(bias_folder)
 
-    out = out_folder+"master_bias.fits"
+    out = out_folder + "master_bias.fits"
     files = os.listdir()
     ref_header = fits.getheader(files[0])
     NCOMBINE = len(files)
