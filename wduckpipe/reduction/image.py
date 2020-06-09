@@ -22,7 +22,7 @@ def move_files(files, destination):
         destination -- String containing destination folder.
 
     Return:
-        None -- Just move files
+        None
     """
     quantity = len(files)
     print("Moving", quantity, "files... \n")
@@ -38,40 +38,68 @@ def move_files(files, destination):
 
 def get_headers_cwd():
     """
-    Retorna cabeçalhos dos arquivos na pasta atual
+    Return FITS headers from files on the current directory.
+     
+     Args:
+        None
+    Return:
+        headers -- List containing headers.
     """
     files = glob("*.fits")
     headers = [fits.getheader(file) for file in files]
+
     return headers
 
 
 def mkdirs_list(list_of_directories):
     """
-    Cria lista de diretórios e dá feedback do progresso
+    Create all the directories from a list (giving feedback).
+
+    Args:
+       list_of_directories -- List with strings of folder path's to create.
+    Return:
+        None
     """
     for i in list_of_directories:
-        print("Criando diretório:", i)
+        print("Creating directories", i)
         os.makedirs(i)
     print("\n")
 
 
 def select_images(keyword, value):
     """
-    Seleciona arquivos da coleção de cabeçalhos baseados numa chave e valor
+    Return FITS file from the current directory if keyword matches value.
+
+    Args:
+        keyword -- String with the keyword to look at the header
+        value -- String or numeric containing value to match
+    Return:
+        matches -- List containing string of the name of FITS files 
     """
     files = glob("*.fits")
     headers = get_headers_cwd()
-    return [j for i, j in zip(headers, files) if i[keyword] == value]
+    matches = [file for header, file in zip(headers, files)
+               if header[keyword] == value]
+    return matches
 
 
 def select_images_CommentFormat(keyword, value):
     """
-    Seleciona arquivos da coleção de cabeçalhos baseados numa chave e valor
+    Return FITS file from the current directory if keyword matches value.
+    While avoiding problems due to OPD comment formating
+
+    Args:
+        keyword -- String with the keyword to look at the header
+        value -- String or numeric containing value to match
+    Return:
+        matches -- List containing string of the name of FITS files 
     """
     headers = get_headers_cwd()
-    return [i["IMAGE"] + ".fits" for i in headers
-            if i[keyword][0].split("'")[1].strip() == value]
 
+    matches = [i["IMAGE"] + ".fits" for i in headers
+               if i[keyword][0].split("'")[1].strip() == value]
+
+    return matches
 
 def sep_by_object(folder="./"):
     """
