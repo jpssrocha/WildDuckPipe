@@ -39,9 +39,10 @@ def move_files(files, destination):
 def get_headers_cwd():
     """
     Return FITS headers from files on the current directory.
-     
+
      Args:
         None.
+
     Return:
         headers -- List containing headers.
     """
@@ -73,6 +74,7 @@ def select_images(keyword, value):
     Args:
         keyword -- String with the keyword to look at the header.
         value -- String or numeric containing value to match.
+
     Return:
         matches -- List containing string of the name of FITS files.
     """
@@ -91,6 +93,7 @@ def select_images_CommentFormat(keyword, value):
     Args:
         keyword -- String with the keyword to look at the header.
         value -- String or numeric containing value to match.
+
     Return:
         matches -- List containing string of the name of FITS files.
     """
@@ -104,11 +107,11 @@ def select_images_CommentFormat(keyword, value):
 
 def sep_by_object(folder="./"):
     """
-    Create folders structure and organize files by using the OBJECTS keyword on 
-    the FITS files.
+    Create folders structure and organize files by using the OBJECTS keyword on
+    the FITS files of the given folder.
 
     Args:
-        folder -- String containing folder to separates FITS (default is
+        folder -- String containing folder to separate FITS (default is
                   current folder).
     Return
         None.
@@ -119,7 +122,7 @@ def sep_by_object(folder="./"):
     headers = get_headers_cwd()
     objcts = set([obj["OBJECT"] for obj in headers])
 
-    print("Observed objects: ", objcts)
+    print("Object observed: ", objcts)
 
     mkdirs_list(objcts)
 
@@ -132,7 +135,15 @@ def sep_by_object(folder="./"):
 
 def sep_by_filter(folder="./"):
     """
-    Separa arquivos em uma pasta de acordo com o filtro
+    Create folders structure and organize files by using the FILTER keyword on
+    the FITS files of the given folder.
+
+    Args:
+        folder -- String containing folder to separate FITS (default is
+                  current folder).
+
+    Return
+        None.
     """
     current_folder = os.getcwd()
     os.chdir(folder)
@@ -140,8 +151,8 @@ def sep_by_filter(folder="./"):
     headers = get_headers_cwd()
     filters = set([obj["FILTER"] for obj in headers])
 
-    print("Imagens nos filtros:\t", filters, "\n")
-    # Creating directories
+    print("Images on filters: ", filters, "\n")
+
     mkdirs_list(filters)
 
     for f in filters:
@@ -153,8 +164,15 @@ def sep_by_filter(folder="./"):
 
 def sep_object_by_filter(folder="./"):
     """
-    Dado caminho relativo para uma pasta cuja as sub-pastas são de objetos,
-    separa as imagens dos objetos por filtro
+    Given path of folder with objects sub-folders, separate FITS files in
+    folders by filters
+
+    Args:
+        folder -- String containing folder to separate FITS (default is
+                  current folder).
+
+    Return:
+        None.
     """
 
     current_folder = os.getcwd()
@@ -163,7 +181,7 @@ def sep_object_by_filter(folder="./"):
     objects_folder_list = os.listdir()
 
     for folder in objects_folder_list:
-        print("Organizando imagens de ", folder, "\n")
+        print("Organizing images of ", folder, "\n")
         sep_by_filter(folder)
         print("\n")
 
@@ -172,7 +190,15 @@ def sep_object_by_filter(folder="./"):
 
 def sep_by_exptime(folder="./"):
     """
-    Separa arquivos em uma pasta de acordo com o filtro
+    Create folders structure and organize files by using the EXPTIME keyword on
+    the FITS files of the given folder.
+
+    Args:
+        folder -- String containing folder to separate FITS (default is
+                  current folder).
+
+    Return:
+        None.
     """
     current_folder = os.getcwd()
     os.chdir(folder)
@@ -180,15 +206,17 @@ def sep_by_exptime(folder="./"):
     headers = get_headers_cwd()
     exptimes = set([obj["EXPTIME"].split(",")[0] for obj in headers])
 
-    print("Imagens nos tempos de exposição:\t", exptimes, "\n")
-    # Creating directories
-    mkdirs_list(filters)
+    print("Exptimes for the object:\t", exptimes, "\n")
+
+    mkdirs_list(exptimes)
 
     for expt in exptimes:
         move_files(select_images("EXPTIME", expt), expt)
         headers = get_headers_cwd()
 
     os.chdir(current_folder)
+
+# Functions to deal with calibration files
 
 
 def imstat(fits_file):
@@ -272,8 +300,8 @@ def make_MasterFlat(flat_folder, out_folder, master_bias):
 
     file_name = out_folder + "master_flat_%s.fits" % (band)
 
-    # Escrevendo meta-dados no cabeçalho
     now = dt.now().strftime("%B %d, %Y")
+
     ref_header["NCOMBINE"] = NCOMBINE
     ref_header["MASTER_FLAT"] = "Done. %s" % (now)
 
@@ -387,8 +415,8 @@ def initial_reduction(observation_folder="./"):
 
     os.chdir(observation_folder)
 
-    # Definindo nomes das pastas para estrutura de arquivos
-    # (referente a pasta atual)
+    # Definindo endereços das pastas para estrutura de arquivos
+
     root = os.getcwd()
     bias_folder = root + "/calibration/bias"
     flat_folder = root + "/calibration/flat"
