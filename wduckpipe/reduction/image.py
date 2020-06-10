@@ -387,6 +387,9 @@ def ccdproc(image_file, out_path, master_bias, master_flat):
         out_path -- String with exit name for generated file.
         master_bias -- String with path to master bias.
         master_flat -- String with path to master flat.
+
+    Return:
+        None.
     """
     mbias = fits.getdata(master_bias)
     mflat = fits.getdata(master_flat)
@@ -411,11 +414,18 @@ def ccdproc(image_file, out_path, master_bias, master_flat):
 
 def ccdproc_all(folder_path, out_path, master_bias, master_flat):
     """
-    Dado caminho para imagem de determinado objeto em
-    determinado filtro aplica imagens de calibração indicadas
-    para bias e no dicionário de flats.
-    """
+    Apply calibrations for all FITS files in a folder given path to it and to
+    calibration files.
 
+    Args:
+        folder_path -- String with path to folder.
+        out_path -- String wit path to exit folder.
+        master_bias -- String with path to master bias.
+        master_flat -- String with path to master flat.
+
+    Return:
+        None.
+    """
     current_folder = os.getcwd()
     os.chdir(folder_path)
 
@@ -427,7 +437,7 @@ def ccdproc_all(folder_path, out_path, master_bias, master_flat):
 
     N = len(images)
 
-    print("Processando %i imagens no filtro %s" % (N, band))
+    print("Processing %i images on filter %s" % (N, band))
 
     for image in images:
         ccdproc(image, out_path, master_bias, master_flat)
@@ -436,7 +446,19 @@ def ccdproc_all(folder_path, out_path, master_bias, master_flat):
 
 
 def ccdproc_all_filters(folder_path, out_path, master_bias, master_flat_dict):
+    """
+    Apply calibration files for every FITS file in every folder containing
+    images on a given filter (use folder name as guide to select flat to use).
 
+    Args:
+        folder_path -- String with path to folder.
+        out_path -- String wit path to exit folder.
+        master_bias -- String with path to master bias.
+        master_flat_dict -- Dictinary to be returned out of make_MasterFlat_all.
+
+    Return:
+        None.
+    """
     current_folder = os.getcwd()
     os.chdir(folder_path)
 
@@ -456,8 +478,13 @@ def initial_reduction(observation_folder="./"):
     informações do header no padrão do LNA adotado desde a missão OI2018B-011.
     Dado caminho relativo da pasta.
 
-    Input:
+    Complete initial processing of observation folder
+
+    Args:
         observation_folder -- String com o nome da pasta
+    Return:
+        None.
+
     """
 
     os.chdir(observation_folder)
