@@ -262,12 +262,15 @@ def make_MasterBias(bias_folder, out_folder):
         out_folder -- String with path to write the generated master bias.
     
     Return:
-        out -- String with the path to the created file
+        out -- String with the path to the created file.
     """
     current_folder = os.getcwd()
     os.chdir(bias_folder)
 
     out = out_folder + "master_bias.fits"
+
+    print("Generating master bias on file: ", out)
+
     files = os.listdir()
     ref_header = fits.getheader(files[0])
     NCOMBINE = len(files)
@@ -296,8 +299,20 @@ def make_MasterBias(bias_folder, out_folder):
 
 def make_MasterFlat(flat_folder, out_folder, master_bias):
     """
-    Dada localização relativa da pasta de flats e o master bias, gera
-    arquivos de flat master
+    Given path to folder containing flat images, use supplied master bias to 
+    generate master flat.
+
+    FITS files are combined by median, bias subtracted and normalized by the 
+    mean of pixel statistics. Header is an updated version of hte first FITS.
+
+    Args:
+        flat_folder -- String with path to flat folder.
+        out_folder -- Sring with path to folder to write resulting file.
+        master_bias -- String with path to master bias. 
+
+    Return:
+        file_name -- String with name of resulting file.
+        
     """
     current_folder = os.getcwd()
     os.chdir(flat_folder)
