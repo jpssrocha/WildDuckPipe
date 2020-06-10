@@ -22,7 +22,7 @@ def move_files(files, destination):
         destination -- String containing destination folder.
 
     Return:
-        None
+        None.
     """
     quantity = len(files)
     print("Moving", quantity, "files... \n")
@@ -41,7 +41,7 @@ def get_headers_cwd():
     Return FITS headers from files on the current directory.
      
      Args:
-        None
+        None.
     Return:
         headers -- List containing headers.
     """
@@ -58,7 +58,7 @@ def mkdirs_list(list_of_directories):
     Args:
        list_of_directories -- List with strings of folder path's to create.
     Return:
-        None
+        None.
     """
     for i in list_of_directories:
         print("Creating directories", i)
@@ -71,10 +71,10 @@ def select_images(keyword, value):
     Return FITS file from the current directory if keyword matches value.
 
     Args:
-        keyword -- String with the keyword to look at the header
-        value -- String or numeric containing value to match
+        keyword -- String with the keyword to look at the header.
+        value -- String or numeric containing value to match.
     Return:
-        matches -- List containing string of the name of FITS files 
+        matches -- List containing string of the name of FITS files.
     """
     files = glob("*.fits")
     headers = get_headers_cwd()
@@ -86,13 +86,13 @@ def select_images(keyword, value):
 def select_images_CommentFormat(keyword, value):
     """
     Return FITS file from the current directory if keyword matches value.
-    While avoiding problems due to OPD comment formating
+    While avoiding problems due to OPD comment formating.
 
     Args:
-        keyword -- String with the keyword to look at the header
-        value -- String or numeric containing value to match
+        keyword -- String with the keyword to look at the header.
+        value -- String or numeric containing value to match.
     Return:
-        matches -- List containing string of the name of FITS files 
+        matches -- List containing string of the name of FITS files.
     """
     headers = get_headers_cwd()
 
@@ -101,17 +101,25 @@ def select_images_CommentFormat(keyword, value):
 
     return matches
 
+
 def sep_by_object(folder="./"):
     """
-    Separa os arquivos fits em uma pasta de acordo com o objeto observado
+    Create folders structure and organize files by using the OBJECTS keyword on 
+    the FITS files.
+
+    Args:
+        folder -- String containing folder to separates FITS (default is
+                  current folder).
+    Return
+        None.
     """
-    current_folder = os.getcwd()  # Recording the present folder to return
+    current_folder = os.getcwd()
     os.chdir(folder)
 
     headers = get_headers_cwd()
-    objcts = set([obj["OBJECT"] for obj in headers])  # Creating set of objects
+    objcts = set([obj["OBJECT"] for obj in headers])
 
-    print(objcts)
+    print("Observed objects: ", objcts)
 
     mkdirs_list(objcts)
 
