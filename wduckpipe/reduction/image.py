@@ -380,8 +380,13 @@ def make_MasterFlat_all(flats_folder, out_folder, master_bias):
 
 def ccdproc(image_file, out_path, master_bias, master_flat):
     """
-    Dado caminho para imagem de determinado objeto em determinado filtro
-    aplica imagens de calibração
+    Given path to FITS file applies given calibration files (bias and flat).
+    
+    Args:
+        image_file -- String containing FITS file path.
+        out_path -- String with exit name for generated file.
+        master_bias -- String with path to master bias.
+        master_flat -- String with path to master flat.
     """
     mbias = fits.getdata(master_bias)
     mflat = fits.getdata(master_flat)
@@ -389,7 +394,7 @@ def ccdproc(image_file, out_path, master_bias, master_flat):
     header = fits.getheader(image_file)
     image = fits.getdata(image_file)
 
-    print("Processando imagem: %s ..." % (image_file))
+    print("Processing image: %s ..." % (image_file))
 
     proc_image = (image - mbias) / mflat
 
