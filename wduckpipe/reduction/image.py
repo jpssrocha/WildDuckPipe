@@ -222,28 +222,47 @@ def sep_by_exptime(folder="./"):
 def imstat(fits_file):
     """
     Printa em tela e retorna estatísticas da imagem em um dicionário
+    Print pixel statistics from given FITS file and return a dictionary with it.
+    
+    Args:
+        fits_file -- String containing path to FITS file to examine.
+    
+    Return:
+        stats -- Dictionary containing median, mean, std, min, max
     """
     image = fits.getdata(fits_file)
-    print("Imagem: %s" % (fits_file))
-    print("Mediana: " + str(np.median(image)) + " contagens")
-    print("Média: " + str(np.mean(image)) + " contagens")
-    print("Std: " + str(np.std(image)) + " contagens")
-    print("Max: " + str(np.max(image)) + " contagens")
-    print("Min: " + str(np.min(image)) + " contagens")
+    print("Image: %s" % (fits_file))
+    print("Median: " + str(np.median(image)) + " counts")
+    print("Mean: " + str(np.mean(image)) + " counts")
+    print("Std: " + str(np.std(image)) + " counts")
+    print("Min: " + str(np.min(image)) + " counts")
+    print("Max: " + str(np.max(image)) + " counts")
     print("\n")
 
-    return {"median": np.median(image),
-            "mean": np.mean(image),
-            "std": np.std(image),
-            "max": np.max(image),
-            "min": np.min(image)
+    stats = {"median": np.median(image),
+             "mean": np.mean(image),
+             "std": np.std(image),
+             "min": np.min(image),
+             "max": np.max(image)
             }
+
+    return stats
 
 
 def make_MasterBias(bias_folder, out_folder):
     """
-    Dado o caminho relativo a pasta com os bias gera master bias e salva
-    no caminho relativo especificado
+    Given path to folder containing bias files, generates master bias file on 
+    specified folder.
+
+    Works by creating image cube with all images and combining on the 0th axis
+    by the median.
+
+    Args:
+        bias_folder -- String with path to the folder containing the bias files.
+        out_folder -- String with path to write the generated master bias.
+    
+    Return:
+        out -- String with the path to the created file
     """
     current_folder = os.getcwd()
     os.chdir(bias_folder)
@@ -253,21 +272,21 @@ def make_MasterBias(bias_folder, out_folder):
     ref_header = fits.getheader(files[0])
     NCOMBINE = len(files)
 
-    print("Carregando e empilhando %i imagens ... \n" % (NCOMBINE))
+    print("Loading and stacking %i images ... \n" % (NCOMBINE))
     bias_cube = np.stack([fits.getdata(image) for image in files], axis=0)
 
-    print("Extraindo medianas ... \n")
+    print("Extracting medians ... \n")
     master_bias = np.median(bias_cube, axis=0)
 
-    # Escrevendo meta-dados no cabeçalho
-    now = dt.now().strftime("%B %d, %Y")
+    now = dt.now().strftime("%B %d, %Y")  # Getting time stamp
+
     ref_header["NCOMBINE"] = NCOMBINE
     ref_header["MASTER_BIAS"] = "Done. %s" % (now)
 
-    print("Escrevendo FITS ... \n")
+    print("Writing FITS ... \n")
     fits.writeto(out, master_bias, ref_header)
 
-    print("Gerado master bias: %s \n Estatistica de contagens: \n" % out)
+    print("Generating master bias: %s \n Count statistics: \n" % out)
     imstat(out)
 
     os.chdir(current_folder)
