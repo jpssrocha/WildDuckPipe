@@ -312,7 +312,6 @@ def make_MasterFlat(flat_folder, out_folder, master_bias):
 
     Return:
         file_name -- String with name of resulting file.
-        
     """
     current_folder = os.getcwd()
     os.chdir(flat_folder)
@@ -350,8 +349,16 @@ def make_MasterFlat(flat_folder, out_folder, master_bias):
 
 def make_MasterFlat_all(flats_folder, out_folder, master_bias):
     """
-    Dado caminho relativo da pasta de flats aplica função de master flat
-    para cada filtro (dado que foram separados em pastas)
+    Given path of folder with flats separated in folders by filters, and master
+    bias to apply, it create all flats and write on the passed path. 
+
+    Args:
+        flats_folder -- String with path to the folder with the flats.
+        out_folder -- String with path to write flats.
+        master_bias -- String with path to master bias.
+
+    Return:
+        mflat_dict -- Dictionary containing path to each flat of each filter.
     """
 
     current_folder = os.getcwd()
@@ -362,6 +369,7 @@ def make_MasterFlat_all(flats_folder, out_folder, master_bias):
     mflat_dict = {}
 
     for folder in sub_folders:
+        print("Making flat on filter:", folder)
         mflat_dict[folder] = make_MasterFlat(folder, out_folder, master_bias)
         print("\n")
 
