@@ -635,8 +635,6 @@ def align_and_combine(folder, zero_shift, sequence_len, symmetrical=True):
 
     print("Imagens alinhadas com sucesso !!!")
 
-    # Combinações
-
     if symmetrical:
         print("Combinando imagens como sequencias simétricas")
         bin_quantity = int(len(images)/sequence_len)  # Bins simétricas
