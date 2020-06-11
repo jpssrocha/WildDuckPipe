@@ -8,9 +8,8 @@ import os
 from glob import glob
 from astropy.io import fits
 from datetime import datetime as dt
-import astroalign
 
-# File movementation functions
+# File movement functions
 
 
 def move_files(files, destination):
@@ -603,11 +602,22 @@ def initial_reduction(observation_folder="./"):
     print("Redução conluída. Foram processados %i arquivos fits." % (N))
 
 
-def align_and_combine(folder, zero_shift, sequence_len, symmetrical=True):
+def align_and_combine(folder, zero_shift, sequence_len):
     """
-    Dado caminho a pasta com imagens e o nome da imagem de referência para
-    alinhamento combina as imagens levando em consideração número de
-    exposições simétrico passando o tamanho das sequencias de imagens.
+    Deprecated : 2020-6-11
+        Implementation didn't followed the proposed guidelines.
+
+    Given path to folder containing FITS files of stellar fields and a 
+    reference image to align with, it align images and combine by median in
+    batches of given length.
+
+    Args:
+        folder -- String with path to folder with images to combine.
+        zero_shift -- String with path to reference image to align with.
+        sequence_len -- Integer with length of batches to form.
+
+    Return:
+        None.
     """
 
     current_folder = os.getcwd()
@@ -621,36 +631,37 @@ def align_and_combine(folder, zero_shift, sequence_len, symmetrical=True):
     for image in images:
         images_data[image] = fits.getdata(image)
 
-    print("Imagem de Referência : ", zero_shift)
+    print("Reference image: ", zero_shift)
 
     aligned_images = ["a"+i for i in images]
 
-    print("Alinhando %i imagens ..." % N)
+    print("Aligning %i images ..." % N)
 
     aligned_data = {}
     for original, shifted in zip(images, aligned_images):
-        print("Alinhando imagem:", original)
+        print("Aligning image:", original)
         aligned_data[shifted] = astroalign.register(images_data[original],
                                                     images_data[zero_shift])
 
-    print("Imagens alinhadas com sucesso !!!")
+    print("Images successfully aligned !!!\n")
 
-    if symmetrical:
-        print("Combinando imagens como sequencias simétricas")
-        bin_quantity = int(len(images)/sequence_len)  # Bins simétricas
-        print("Tamanho das sequências: %i, Quantidade de sequencias: %i" %
-              (sequence_len, bin_quantity))
-        divisions = [sequence_len for i in range(sequence_len)]
-        bins = {}
-        register1 = 0
-        register2 = divisions[0]
+    # Generating batches to combine
 
-        for bin in range(bin_quantity):
-            bins[bin] = []
-            for i in range(register1, register2):
-                bins[bin].append(aligned_images[i])
-            register1 = register2
-            register2 += divisions[bin]
+    print("Combining images in equally sized batches")
+    bin_quantity = int(len(images)/sequence_len)  # Same size bins
+    print("Sequence size: %i, Quantity of sequences: %i" %
+          (sequence_len, bin_quantity))
+    divisions = [sequence_len for i in range(sequence_len)]
+    bins = {}
+    register1 = 0
+    register2 = divisions[0]
+
+    for bin in range(bin_quantity):
+        bins[bin] = []
+        for i in range(register1, register2):
+            bins[bin].append(aligned_images[i])
+        register1 = register2
+        register2 += divisions[bin]
 
     for bin in bins:
         ref_image = bins[bin][0].replace("a", "")
@@ -663,12 +674,12 @@ def align_and_combine(folder, zero_shift, sequence_len, symmetrical=True):
         ref_header["NCOMBINE"] = NCOMBINE
 
         cube = np.stack([aligned_data[i] for i in bin_images], axis=0)
-        print("Combinando imagens pela mediana ...\n")
+        print("Combining images by the median ...\n")
         final = np.median(cube, axis=0)
         print(bins[bin])
-        print("\n Escrevendo imagem final", bin)
+        print("\n Writing final image", bin)
         print("...\n")
 
         fits.writeto("final%i.fits" % (bin), final, ref_header)
 
-    print("Imagens Combinadas com Sucesso !!!")
+    print("Images combined with success !!!")
