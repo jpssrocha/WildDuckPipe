@@ -26,12 +26,10 @@ def move_files(files, destination):
     quantity = len(files)
     print("Moving", quantity, "files... \n")
 
-    i = 1
-    for file in files:
+    for i, file in enumerate(files, start=1):
         print("%s ====> %s/%s (%i de %i)" %
               (file, destination, file, i, quantity))
         os.rename(file, destination + "/" + file)
-        i += 1
     print("\n")
 
 
