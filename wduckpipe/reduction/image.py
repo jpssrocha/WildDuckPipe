@@ -368,7 +368,7 @@ def make_MasterFlat_all(flats_folder, out_folder, master_bias):
     mflat_dict = {}
 
     for folder in sub_folders:
-        print("Making flat on filter:", folder)
+        print("Making master flat on filter:", folder)
         mflat_dict[folder] = make_MasterFlat(folder, out_folder, master_bias)
         print("\n")
 
@@ -473,22 +473,25 @@ def ccdproc_all_filters(folder_path, out_path, master_bias, master_flat_dict):
 
 def initial_reduction(observation_folder="./"):
     """
-    Organiza arquivos de observações em pasta, levando em consideração
-    informações do header no padrão do LNA adotado desde a missão OI2018B-011.
-    Dado caminho relativo da pasta.
+    Complete initial processing of observation folder. It organizes files on 
+    folders both by object and filter, generate master calibration files, apply
+    these files on the images taking into consideration the filter.
 
-    Complete initial processing of observation folder
+    Calibration operation is : (image - master_bias)/master_flat
+
+    ATTENTION !!! It works with the standard for header use adopted on
+                  mission OI2018B-011. Given OPD header format.
 
     Args:
-        observation_folder -- String com o nome da pasta
+        observation_folder -- String with path to the folder with files from 
+                              night run.
     Return:
         None.
-
     """
 
     os.chdir(observation_folder)
 
-    # Definindo endereços das pastas para estrutura de arquivos
+    # Defining folder structure
 
     root = os.getcwd()
     bias_folder = root + "/calibration/bias"
@@ -501,105 +504,88 @@ def initial_reduction(observation_folder="./"):
     folders_list = [bias_folder, flat_folder, master_folder,
                     others_folder, raw_science_folder, reduced_science_folder]
 
-    # Depois de definida a estrutura de pastas podemos cria-las
-
-    print("Criando estrutura de pastas ... \n")
+    print("Creating folder structure ... \n")
 
     mkdirs_list(folders_list)
 
-    # Agora vamos olhar os arquivos dentro da pasta e organizar as imagens
-    # de calibração (bias e flat)
+    # Looking at FITS files to organize calibration files (bias and flat)
+    
     headers = get_headers_cwd()
     N = len(headers)
 
     bias_images = select_images("OBJECT", "bias")
     flat_images = select_images("OBJECT", "flat")
 
-    print("Organizando arquivos de calibração ... \n")
+    print("Organizing calibration files ... \n")
 
     move_files(bias_images, bias_folder)
     move_files(flat_images, flat_folder)
 
-    print("Separando flats por filtro ... \n")
+    print("Separating flats by filter ... \n")
 
     sep_by_filter(flat_folder)
 
-    # Seguimos agora organizando o resto das imagens em duas categorias
-    # (science e others) atualizando a seleção de imagens
+    # Organizing remaining images on science and others
 
-    headers = get_headers_cwd()
+    headers = get_headers_cwd()  # Updating headers
 
     science_images = [i["IMAGE"]+".fits" for i in headers
                       if i["COMMENT"][0].split("'")[1].strip() == "science"]
     other_images = [i["IMAGE"]+".fits" for i in headers
                     if i["COMMENT"][0].split("'")[1].strip() != "science"]
 
-    # A função select_images() não funciona nesse caso devido a formatação
-    # do comentário no cabeçalho e a expressão !=.
-    # No futuro posso deixa-la mais robusta
+    # Used an explicit list comprehension instead of the function select_images
+    # because of comment format. On the future can improve it.
 
-    # Continuando com a organização ...
+    # Keeping up the organization ...
 
-    print("Organizando imagens de ciência e outras ... \n")
+    print("Moving science and other images ... \n")
 
     move_files(science_images, raw_science_folder)
     move_files(other_images, others_folder)
 
-    print("Separando imagens por objeto ... \n")
+    print("Separating images by object ... \n")
 
     sep_by_object(raw_science_folder)
     sep_by_object(others_folder)
 
-    print("Separando imagens de ciência dos objetos em filtros ... \n")
+    print("Separating science images by filter ... \n")
 
     sep_object_by_filter(raw_science_folder)
 
-    # Agora estamos com todos os arquivos organizados, vamos seguir gerando
-    # os arquivos de calibração.
-    print("Gerando arquivos de calibração ... \n")
+    # File organized. Starting to generate calibration files.
 
-    print("Gerando Master Bias ... \n")
+    print("Generating calibration files ... \n")
 
     mbias = make_MasterBias(bias_folder, master_folder)
 
-    # A função make_MasterBias() imprime em tela uma boa quantidade de feed
-    # back a cada passo para termos noção de quanto tempo cada passo da
-    # função está demorando para rodar.
-
-    print("Gerando Master Flats ... \n")
-
     mflat_dict = make_MasterFlat_all(flat_folder, master_folder, mbias)
 
-    # Agora que temos as imagens de calibração vamos seguir calibrando
-    # as imagens de ciência
+    # Calibration files done. Starting to apply calibration on science images.
 
-    # Vamos para a pasta de imagens de ciência para ver o que temos
-
-    print("Aplicando arquivos de calibração nas imagens de ciência ... \n ")
+    print("Applying calibration files to science images ... \n ")
 
     os.chdir(raw_science_folder)
     objcts = os.listdir()
 
     for objct in objcts:
-        print("Aplicando calibrações para %s ... \n" % objct)
+        print("Applying calibrations to object %s ... \n" % objct)
         ccdproc_all_filters(objct, reduced_science_folder, mbias, mflat_dict)
+
+    print("All images processed !")
+
+    # Images processed. Let's do the final organization
 
     os.chdir(root)
 
-    # Imagens agora processadas na pasta de imagens reduzidas, por
-    # simplicidade elas foram salvas todas juntas, agora vamos separa-las
-
-    print("Fazendo organização dos arquivos reduzidos ..")
+    print("Final organization ...")
 
     sep_by_object(reduced_science_folder)
     sep_object_by_filter(reduced_science_folder)
 
-    # Finalmente as imagens estão organizadas e corrigidas para erros
-    # instrumentais.
-
     os.chdir(root)
 
-    print("Redução conluída. Foram processados %i arquivos fits." % (N))
+    print("Reduction finished. %i FITS files where processed." % (N))
 
 
 def align_and_combine(folder, zero_shift, sequence_len):
