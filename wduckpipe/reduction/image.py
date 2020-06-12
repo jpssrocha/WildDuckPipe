@@ -84,26 +84,6 @@ def select_images(keyword, value):
     return matches
 
 
-def select_images_CommentFormat(keyword, value):
-    """
-    Return FITS file from the current directory if keyword matches value.
-    While avoiding problems due to OPD comment formating.
-
-    Args:
-        keyword -- String with the keyword to look at the header.
-        value -- String or numeric containing value to match.
-
-    Return:
-        matches -- List containing string of the name of FITS files.
-    """
-    headers = get_headers_cwd()
-
-    matches = [i["IMAGE"] + ".fits" for i in headers
-               if i[keyword][0].split("'")[1].strip() == value]
-
-    return matches
-
-
 def sep_by_object(folder="./"):
     """
     Create folders structure and organize files by using the OBJECTS keyword on
@@ -471,7 +451,7 @@ def ccdproc_all_filters(folder_path, out_path, master_bias, master_flat_dict):
     os.chdir(current_folder)
 
 
-def initial_reduction(observation_folder="./"):
+def initial_reduction(observation_folder="./", backup=True):
     """
     Complete initial processing of observation folder. It organizes files on 
     folders both by object and filter, generate master calibration files, apply
@@ -488,6 +468,7 @@ def initial_reduction(observation_folder="./"):
     Return:
         None.
     """
+    # Implement backup functionality here 
 
     os.chdir(observation_folder)
 
@@ -535,7 +516,7 @@ def initial_reduction(observation_folder="./"):
                     if i["COMMENT"][0].split("'")[1].strip() != "science"]
 
     # Used an explicit list comprehension instead of the function select_images
-    # because of comment format. On the future can improve it.
+    # because of OPD comment format.
 
     # Keeping up the organization ...
 
@@ -583,89 +564,8 @@ def initial_reduction(observation_folder="./"):
     sep_by_object(reduced_science_folder)
     sep_object_by_filter(reduced_science_folder)
 
+    # Add separation by exposure time here
+
     os.chdir(root)
 
     print("Reduction finished. %i FITS files where processed." % (N))
-
-
-def align_and_combine(folder, zero_shift, sequence_len):
-    """
-    Deprecated : 2020-6-11
-        Implementation didn't followed the proposed guidelines.
-
-    Given path to folder containing FITS files of stellar fields and a 
-    reference image to align with, it align images and combine by median in
-    batches of given length.
-
-    Args:
-        folder -- String with path to folder with images to combine.
-        zero_shift -- String with path to reference image to align with.
-        sequence_len -- Integer with length of batches to form.
-
-    Return:
-        None.
-    """
-
-    current_folder = os.getcwd()
-    os.chdir(folder)
-
-    images = os.listdir()
-    images.sort()
-    N = len(images)
-
-    images_data = {}
-    for image in images:
-        images_data[image] = fits.getdata(image)
-
-    print("Reference image: ", zero_shift)
-
-    aligned_images = ["a"+i for i in images]
-
-    print("Aligning %i images ..." % N)
-
-    aligned_data = {}
-    for original, shifted in zip(images, aligned_images):
-        print("Aligning image:", original)
-        aligned_data[shifted] = astroalign.register(images_data[original],
-                                                    images_data[zero_shift])
-
-    print("Images successfully aligned !!!\n")
-
-    # Generating batches to combine
-
-    print("Combining images in equally sized batches")
-    bin_quantity = int(len(images)/sequence_len)  # Same size bins
-    print("Sequence size: %i, Quantity of sequences: %i" %
-          (sequence_len, bin_quantity))
-    divisions = [sequence_len for i in range(sequence_len)]
-    bins = {}
-    register1 = 0
-    register2 = divisions[0]
-
-    for bin in range(bin_quantity):
-        bins[bin] = []
-        for i in range(register1, register2):
-            bins[bin].append(aligned_images[i])
-        register1 = register2
-        register2 += divisions[bin]
-
-    for bin in bins:
-        ref_image = bins[bin][0].replace("a", "")
-        ref_header = fits.getheader(ref_image)
-
-        NCOMBINE = len(bins[bin])
-
-        bin_images = bins[bin]
-
-        ref_header["NCOMBINE"] = NCOMBINE
-
-        cube = np.stack([aligned_data[i] for i in bin_images], axis=0)
-        print("Combining images by the median ...\n")
-        final = np.median(cube, axis=0)
-        print(bins[bin])
-        print("\n Writing final image", bin)
-        print("...\n")
-
-        fits.writeto("final%i.fits" % (bin), final, ref_header)
-
-    print("Images combined with success !!!")
