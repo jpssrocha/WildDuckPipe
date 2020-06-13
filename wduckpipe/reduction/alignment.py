@@ -46,15 +46,17 @@ def align_with(image, ref_matrix, ref_name):
     fits.writeto(new_image, aligned_image, header)
     os.remove(image)
 
-def align_all_images(images_folder, ref_file):
+def align_all_images(images_folder, ref_file=None):
     """
-    Align all FITS stellar images to reference file.
+    Align all FITS stellar images to reference file. If reference file is set
+    to None it uses the first image in the folder.
 
     # Wraps align_with function.
 
     Args:
         images_folder -- String with path to folder with images to align.
-        ref_file -- String with path to FITS with reference field.
+        ref_file -- String with path to FITS with reference field. Default is
+                    None, so it takes the first file of the folder.
 
     Return:
         None.
@@ -62,17 +64,22 @@ def align_all_images(images_folder, ref_file):
     File transformation:
         Re-write FITS files with aligned version.
     """
-
     os.chdir(images_folder)
+    images = glob("*.fits")
+
+    if ref_file == None:
+        ref_image = images[0]
 
     ref_image = fits.getdata(ref_file)
-    images = glob("*.fits")
     N = len(images) - 1
+
 
     print(f"Aligning {N} images with file {ref_file} in folder {images_folder}")
 
     for i, im in enumerate(images, start=1):
-        print(f"Aligning: {im} ({i} of {N})"
+        print(f"Aligning: {im} ({i} of {N})")
         align_with(im, ref_image, ref_file)
+
+    os.chdir("../")
 
 
