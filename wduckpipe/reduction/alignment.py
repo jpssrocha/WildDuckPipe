@@ -1,12 +1,14 @@
-"""
-This module contains functions to align images.
+"""Alignment utilities
+
+This module contains functions to help align images.
 """
 import numpy as np
 import astroalign
 from astropy.io import fits
 from glob import glob
+import os
 
-def align_with(image, ref_matrix, ref_name):
+def align_with(image, ref_matrix, ref_file):
     """
     Given a FITS file it will open the file and align to the reference image
     matrix and rewrite the file.
@@ -41,7 +43,7 @@ def align_with(image, ref_matrix, ref_name):
 
     # Re-write file and update header
 
-    header["Aligned_to"] = ref_file
+    header["ALIGNED-TO"] = ref_file
 
     fits.writeto(new_image, aligned_image, header)
     os.remove(image)
@@ -66,20 +68,21 @@ def align_all_images(images_folder, ref_file=None):
     """
     os.chdir(images_folder)
     images = glob("*.fits")
+    images.sort()
 
     if ref_file == None:
-        ref_image = images[0]
+        ref_file = images[0]
 
     ref_image = fits.getdata(ref_file)
-    N = len(images) - 1
+    N = len(images)
 
 
-    print(f"Aligning {N} images with file {ref_file} in folder {images_folder}")
+    print(f"Aligning {N} images with file {ref_file} in folder {images_folder}.\n")
 
     for i, im in enumerate(images, start=1):
-        print(f"Aligning: {im} ({i} of {N})")
+        print(f"Aligning: {im} ({i} of {N}).")
         align_with(im, ref_image, ref_file)
 
+    print(f"\n Finished alignment of {images_folder} images.")
+
     os.chdir("../")
-
-
