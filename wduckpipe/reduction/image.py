@@ -58,9 +58,9 @@ def mkdirs_list(list_of_directories):
     Return:
         None.
     """
-    for i in list_of_directories:
-        print("Creating directories", i)
-        os.makedirs(i)
+    for directory in list_of_directories:
+        print("Creating directory:", directory)
+        os.makedirs(directory)
     print("\n")
 
 
@@ -200,10 +200,10 @@ def imstat(fits_file):
     """
     Printa em tela e retorna estatísticas da imagem em um dicionário
     Print pixel statistics from given FITS file and return a dictionary with it.
-    
+
     Args:
         fits_file -- String containing path to FITS file to examine.
-    
+
     Return:
         stats -- Dictionary containing median, mean, std, min, max
     """
@@ -221,14 +221,14 @@ def imstat(fits_file):
              "std": np.std(image),
              "min": np.min(image),
              "max": np.max(image)
-            }
+             }
 
     return stats
 
 
 def make_MasterBias(bias_folder, out_folder):
     """
-    Given path to folder containing bias files, generates master bias file on 
+    Given path to folder containing bias files, generates master bias file on
     specified folder.
 
     Works by creating image cube with all images and combining on the 0th axis
@@ -237,7 +237,7 @@ def make_MasterBias(bias_folder, out_folder):
     Args:
         bias_folder -- String with path to the folder containing the bias files.
         out_folder -- String with path to write the generated master bias.
-    
+
     Return:
         out -- String with the path to the created file.
     """
@@ -276,16 +276,16 @@ def make_MasterBias(bias_folder, out_folder):
 
 def make_MasterFlat(flat_folder, out_folder, master_bias):
     """
-    Given path to folder containing flat images, use supplied master bias to 
+    Given path to folder containing flat images, use supplied master bias to
     generate master flat.
 
-    FITS files are combined by median, bias subtracted and normalized by the 
+    FITS files are combined by median, bias subtracted and normalized by the
     mean of pixel statistics. Header is an updated version of hte first FITS.
 
     Args:
         flat_folder -- String with path to flat folder.
         out_folder -- Sring with path to folder to write resulting file.
-        master_bias -- String with path to master bias. 
+        master_bias -- String with path to master bias.
 
     Return:
         file_name -- String with name of resulting file.
@@ -327,7 +327,7 @@ def make_MasterFlat(flat_folder, out_folder, master_bias):
 def make_MasterFlat_all(flats_folder, out_folder, master_bias):
     """
     Given path of folder with flats separated in folders by filters, and master
-    bias to apply, it create all flats and write on the passed path. 
+    bias to apply, it create all flats and write on the passed path.
 
     Args:
         flats_folder -- String with path to the folder with the flats.
@@ -358,7 +358,7 @@ def make_MasterFlat_all(flats_folder, out_folder, master_bias):
 def ccdproc(image_file, out_path, master_bias, master_flat):
     """
     Given path to FITS file applies given calibration files (bias and flat).
-    
+
     Args:
         image_file -- String containing FITS file path.
         out_path -- String with exit name for generated file.
@@ -451,7 +451,7 @@ def ccdproc_all_filters(folder_path, out_path, master_bias, master_flat_dict):
 
 def initial_reduction(observation_folder="./", backup=True):
     """
-    Complete initial processing of observation folder. It organizes files on 
+    Complete initial processing of observation folder. It organizes files on
     folders both by object and filter, generate master calibration files, apply
     these files on the images taking into consideration the filter.
 
@@ -461,12 +461,12 @@ def initial_reduction(observation_folder="./", backup=True):
                   mission OI2018B-011. Given OPD header format.
 
     Args:
-        observation_folder -- String with path to the folder with files from 
+        observation_folder -- String with path to the folder with files from
                               night run.
     Return:
         None.
     """
-    # Implement backup functionality here 
+    # Implement backup functionality here
 
     os.chdir(observation_folder)
 
@@ -488,7 +488,7 @@ def initial_reduction(observation_folder="./", backup=True):
     mkdirs_list(folders_list)
 
     # Looking at FITS files to organize calibration files (bias and flat)
-    
+
     headers = get_headers_cwd()
     N = len(headers)
 
