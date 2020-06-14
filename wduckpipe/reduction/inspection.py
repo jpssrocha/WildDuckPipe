@@ -18,7 +18,7 @@ def norm_by_average(array):
     "Takes numpy array and gives it back normalized"
     return array/np.average(array)
 
-def extract_block(cube, x0, y0, delta=4):
+def extract_block(cube, x0, y0, delta=5):
     """"
     Given an image data cube, as a numpy 3d array, returns a block of the
     array along the 0 axis around the target point (x0,y0) with an 2*delta
@@ -28,7 +28,7 @@ def extract_block(cube, x0, y0, delta=4):
     xb, yb = x0+delta, y0+delta
     return cube[:, ya:yb, xa:xb]
 
-def sigma_block(cube, x, y, delta=4):
+def sigma_block(cube, x, y, delta=5):
     """
     Given lists of x and y coordinates of the central pixels, from sky
     areas, gives back the std within a (2*delta)**2 pix**2 area.
