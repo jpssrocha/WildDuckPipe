@@ -6,7 +6,7 @@ This a simple doc describing quickly the package, the adopted structure and
 conventions, as well as why they're adopted. 
 
 > PS: These conventions where somewhat arbitrary
-		and reflect my lack of experience.
+	  and reflect my lack of experience.
 
 # Purpose
 
@@ -55,7 +55,7 @@ make the scope of the functions itself handle the memory usage passively.
 a complication cause it required active memory handling (that i'm not
 familiar with, so it was not adopted to expedite implementation).
 
-These small functions are organized within sub-packages and modules.
+These small functions are organized within sub-packages and modules
 
 These processes functions can be used to composed into a single pipeline
 script once everything is implemented with a small interface to the system
@@ -69,9 +69,15 @@ program pycodestyle is used to support on the formatting of the modules.
 The language is varying between Portuguese and English, but it all will be
 gradually put in English (will remove this paragraph when it happens)
 
+# Notebooks
+
+The ideas where explored in notebooks first. They can work as documentation
+since each step is described, and can be found at the notebooks folder.
+
 # Warnings
 
-- On the moment, this version of the package is only meant to test the idea the simplest perceived approach is taken in every step.
+- On the moment, this version of the package is only meant to test the idea the
+  simplest perceived approach is taken in every step.
 
 - This project is also a mean to learn about reduction and other subjects
-so a lot of decisions where taken just to maximize learning.
+  so a lot of decisions where taken just to maximize learning.
