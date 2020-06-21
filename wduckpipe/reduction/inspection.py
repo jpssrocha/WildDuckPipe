@@ -1,4 +1,4 @@
-"""
+"""DEPRECATED
 Module containing functions to the inspection algorithm
 """
 import astroalign as aa
