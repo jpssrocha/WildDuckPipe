@@ -66,9 +66,6 @@ shell.
 The coding conventions where mainly taken straight from PEP 8. The linting 
 program pycodestyle is used to support on the formatting of the modules.
 
-The language is varying between Portuguese and English, but it all will be
-gradually put in English (will remove this paragraph when it happens)
-
 # Notebooks
 
 The ideas where explored in notebooks first. They can work as documentation
