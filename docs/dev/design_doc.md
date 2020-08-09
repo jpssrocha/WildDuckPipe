@@ -3,9 +3,6 @@
 This a simple doc describing quickly the package, the adopted structure and
 conventions, as well as why they're adopted. 
 
-> PS: These conventions where somewhat arbitrary
-	  and reflect my lack of experience.
-
 # Purpose
 
 The variable star project developed since mission OP2018B-011 using the
@@ -106,6 +103,20 @@ it will calibrate the image.
 
     > NOTE: It's being studied the possibility of adding metadata to the folder 
     itself or using HDF5 to get faster performance and metadata support.
+
+## Tables
+
+### Time-series (light curve)
+
+For now the convetion for time series tables is:
+
+RA, DEC, ID, Xcenter, Ycenter, MAG1, ERR1, MAG2, ERR2,   ...   , MAGN, ERRN
+
+It is stored on a CSV file (separated by commas).
+
+    > NOTE: This format still the first trial, a different format is being 
+    studied, to give more information and be easier to use, by taking advantage
+    of Pandas access interface.
 
 # Notebooks
 
