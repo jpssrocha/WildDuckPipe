@@ -21,12 +21,17 @@ def align_with(image, ref_matrix, ref_file):
     because of performance. This function in meant to be used within a loop,
     with this the ref_matrix needs to be loaded just once.
 
-    Args:
-        image -- String containing path to image to align with the reference.
-        ref_matrix -- Numpy 2D array containing reference image.
-        ref_name -- String with name of reference FITS file.
+    Parameters
+    ----------
+        image : str
+            Path to image to align with the reference.
+        ref_matrix : Numpy 2D array
+            Reference image.
+        ref_name : str
+            Name of reference FITS file.
 
-    Return:
+    Returns
+    -------
         None.
 
     File transformation:
@@ -59,15 +64,20 @@ def align_all_images(images_folder, ref_file=None):
 
     # Wraps align_with function.
 
-    Args:
-        images_folder -- String with path to folder with images to align.
-        ref_file -- String with path to FITS with reference field. Default is
-                    None, so it takes the first file of the folder.
+    Parameters
+    ----------
+        images_folder : str
+            Path to folder with images to align.
+        ref_file : str
+            Path to FITS with reference field. Default is None, so it takes
+            the first file of the folder.
 
-    Return:
+    Returns
+    -------
         None.
 
-    File transformation:
+    File transformation
+    -------------------
         Re-write FITS files with aligned version.
     """
     os.chdir(images_folder)
