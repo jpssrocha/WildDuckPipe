@@ -16,8 +16,9 @@ def move_files(files, destination):
     """
     Move list of files to specified destination.
 
-    Args:
-        files -- List object containing strings with the address of files.
+    Parameters
+    ----------
+    files -- List object containing strings with the address of files.
         destination -- String containing destination folder.
 
     Return:
@@ -37,8 +38,9 @@ def get_headers_cwd():
     """
     Return FITS headers from files on the current directory.
 
-     Args:
-        None.
+     Parameters
+     ----------
+     None.
 
     Return:
         headers -- List containing headers.
@@ -53,8 +55,9 @@ def mkdirs_list(list_of_directories):
     """
     Create all the directories from a list (giving feedback).
 
-    Args:
-       list_of_directories -- List with strings of folder path's to create.
+    Parameters
+    ----------
+    list_of_directories -- List with strings of folder path's to create.
     Return:
         None.
     """
@@ -68,8 +71,9 @@ def select_images(keyword, value):
     """
     Return FITS file from the current directory if keyword matches value.
 
-    Args:
-        keyword -- String with the keyword to look at the header.
+    Parameters
+    ----------
+    keyword -- String with the keyword to look at the header.
         value -- String or numeric containing value to match.
 
     Return:
@@ -87,8 +91,9 @@ def sep_by_object(folder="./"):
     Create folders structure and organize files by using the OBJECTS keyword on
     the FITS files of the given folder.
 
-    Args:
-        folder -- String containing folder to separate FITS (default is
+    Parameters
+    ----------
+    folder -- String containing folder to separate FITS (default is
                   current folder).
     Return
         None.
@@ -115,8 +120,9 @@ def sep_by_filter(folder="./"):
     Create folders structure and organize files by using the FILTER keyword on
     the FITS files of the given folder.
 
-    Args:
-        folder -- String containing folder to separate FITS (default is
+    Parameters
+    ----------
+    folder -- String containing folder to separate FITS (default is
                   current folder).
 
     Return
@@ -144,8 +150,9 @@ def sep_object_by_filter(folder="./"):
     Given path of folder with objects sub-folders, separate FITS files in
     folders by filters
 
-    Args:
-        folder -- String containing folder to separate FITS (default is
+    Parameters
+    ----------
+    folder -- String containing folder to separate FITS (default is
                   current folder).
 
     Return:
@@ -170,8 +177,9 @@ def sep_by_exptime(folder="./"):
     Create folders structure and organize files by using the EXPTIME keyword on
     the FITS files of the given folder.
 
-    Args:
-        folder -- String containing folder to separate FITS (default is
+    Parameters
+    ----------
+    folder -- String containing folder to separate FITS (default is
                   current folder).
 
     Return:
@@ -201,8 +209,9 @@ def imstat(fits_file):
     Printa em tela e retorna estatísticas da imagem em um dicionário
     Print pixel statistics from given FITS file and return a dictionary with it.
 
-    Args:
-        fits_file -- String containing path to FITS file to examine.
+    Parameters
+    ----------
+    fits_file -- String containing path to FITS file to examine.
 
     Return:
         stats -- Dictionary containing median, mean, std, min, max
@@ -234,8 +243,9 @@ def make_MasterBias(bias_folder, out_folder):
     Works by creating image cube with all images and combining on the 0th axis
     by the median.
 
-    Args:
-        bias_folder -- String with path to the folder containing the bias files.
+    Parameters
+    ----------
+    bias_folder -- String with path to the folder containing the bias files.
         out_folder -- String with path to write the generated master bias.
 
     Return:
@@ -282,8 +292,9 @@ def make_MasterFlat(flat_folder, out_folder, master_bias):
     FITS files are combined by median, bias subtracted and normalized by the
     mean of pixel statistics. Header is an updated version of hte first FITS.
 
-    Args:
-        flat_folder -- String with path to flat folder.
+    Parameters
+    ----------
+    flat_folder -- String with path to flat folder.
         out_folder -- Sring with path to folder to write resulting file.
         master_bias -- String with path to master bias.
 
@@ -329,8 +340,9 @@ def make_MasterFlat_all(flats_folder, out_folder, master_bias):
     Given path of folder with flats separated in folders by filters, and master
     bias to apply, it create all flats and write on the passed path.
 
-    Args:
-        flats_folder -- String with path to the folder with the flats.
+    Parameters
+    ----------
+    flats_folder -- String with path to the folder with the flats.
         out_folder -- String with path to write flats.
         master_bias -- String with path to master bias.
 
@@ -359,8 +371,9 @@ def ccdproc(image_file, out_path, master_bias, master_flat):
     """
     Given path to FITS file applies given calibration files (bias and flat).
 
-    Args:
-        image_file -- String containing FITS file path.
+    Parameters
+    ----------
+    image_file -- String containing FITS file path.
         out_path -- String with exit name for generated file.
         master_bias -- String with path to master bias.
         master_flat -- String with path to master flat.
@@ -394,8 +407,9 @@ def ccdproc_all(folder_path, out_path, master_bias, master_flat):
     Apply calibrations for all FITS files in a folder given path to it and to
     calibration files.
 
-    Args:
-        folder_path -- String with path to folder.
+    Parameters
+    ----------
+    folder_path -- String with path to folder.
         out_path -- String wit path to exit folder.
         master_bias -- String with path to master bias.
         master_flat -- String with path to master flat.
@@ -427,8 +441,9 @@ def ccdproc_all_filters(folder_path, out_path, master_bias, master_flat_dict):
     Apply calibration files for every FITS file in every folder containing
     images on a given filter (use folder name as guide to select flat to use).
 
-    Args:
-        folder_path -- String with path to folder.
+    Parameters
+    ----------
+    folder_path -- String with path to folder.
         out_path -- String wit path to exit folder.
         master_bias -- String with path to master bias.
         master_flat_dict -- Dictinary to be returned out of make_MasterFlat_all.
@@ -460,8 +475,9 @@ def initial_reduction(observation_folder="./", backup=True):
     ATTENTION !!! It works with the standard for header use adopted on
                   mission OI2018B-011. Given OPD header format.
 
-    Args:
-        observation_folder -- String with path to the folder with files from
+    Parameters
+    ----------
+    observation_folder -- String with path to the folder with files from
                               night run.
     Return:
         None.
