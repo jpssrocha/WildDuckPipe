@@ -1,1 +1,5 @@
-"""Modules related to the reduction process"""
+"""Modules related to the reduction process
+
+DEPRECATED !!! 
+
+"""
