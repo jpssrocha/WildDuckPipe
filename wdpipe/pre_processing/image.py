@@ -18,10 +18,13 @@ def move_files(files, destination):
 
     Parameters
     ----------
-    files -- List object containing strings with the address of files.
-        destination -- String containing destination folder.
+        files : List-like object containing strings 
+            Addresses of files.
+        destination : str
+            Destination folder.
 
-    Return:
+    Returns
+    -------
         None.
     """
     quantity = len(files)
@@ -40,10 +43,12 @@ def get_headers_cwd():
 
      Parameters
      ----------
-     None.
+        None.
 
-    Return:
-        headers -- List containing headers.
+    Returns
+    -------
+        headers : List
+            Headers of images on the folder.
     """
     files = glob("*.fits")
     headers = [fits.getheader(file) for file in files]
@@ -57,8 +62,11 @@ def mkdirs_list(list_of_directories):
 
     Parameters
     ----------
-    list_of_directories -- List with strings of folder path's to create.
-    Return:
+        list_of_directories : List-like of strings
+            Path's of folders to create
+
+    Returns
+    -------
         None.
     """
     for directory in list_of_directories:
@@ -73,11 +81,15 @@ def select_images(keyword, value):
 
     Parameters
     ----------
-    keyword -- String with the keyword to look at the header.
-        value -- String or numeric containing value to match.
+        keyword : str 
+            Keyword to look at the header.
+        value : str or numeric
+            Value to match.
 
-    Return:
-        matches -- List containing string of the name of FITS files.
+    Returns
+    -------
+        matches : List of string 
+            Names of selected FITS files.
     """
     files = glob("*.fits")
     headers = get_headers_cwd()
@@ -93,8 +105,9 @@ def sep_by_object(folder="./"):
 
     Parameters
     ----------
-    folder -- String containing folder to separate FITS (default is
-                  current folder).
+    folder : str 
+        Folder to separate FITS files (default is current folder).
+
     Return
         None.
     """
@@ -122,8 +135,8 @@ def sep_by_filter(folder="./"):
 
     Parameters
     ----------
-    folder -- String containing folder to separate FITS (default is
-                  current folder).
+        folder : str
+            Path to folder to separate FITS (default is current folder).
 
     Return
         None.
@@ -152,10 +165,11 @@ def sep_object_by_filter(folder="./"):
 
     Parameters
     ----------
-    folder -- String containing folder to separate FITS (default is
-                  current folder).
+        folder : str
+            Path to folder to separate FITS (default is current folder).
 
-    Return:
+    Returns
+    -------
         None.
     """
 
@@ -179,10 +193,11 @@ def sep_by_exptime(folder="./"):
 
     Parameters
     ----------
-    folder -- String containing folder to separate FITS (default is
-                  current folder).
+        folder : str
+            Path to folder to separate FITS (default is current folder).
 
-    Return:
+    Returns
+    -------
         None.
     """
     current_folder = os.getcwd()
@@ -211,10 +226,13 @@ def imstat(fits_file):
 
     Parameters
     ----------
-    fits_file -- String containing path to FITS file to examine.
+        fits_file : str
+            Path to FITS file to examine.
 
-    Return:
-        stats -- Dictionary containing median, mean, std, min, max
+    Returns
+    -------
+        stats : dict 
+            Dictionary containing median, mean, std, min, max
     """
     image = fits.getdata(fits_file)
     print("Image: %s" % (fits_file))
@@ -245,11 +263,15 @@ def make_MasterBias(bias_folder, out_folder):
 
     Parameters
     ----------
-    bias_folder -- String with path to the folder containing the bias files.
-        out_folder -- String with path to write the generated master bias.
+        bias_folder : str 
+            Path to the folder containing the bias files.
+        out_folder : str
+            Path to write the generated master bias.
 
-    Return:
-        out -- String with the path to the created file.
+    Returns
+    -------
+        out : str
+            Path to the created file.
     """
     current_folder = os.getcwd()
     os.chdir(bias_folder)
@@ -294,12 +316,17 @@ def make_MasterFlat(flat_folder, out_folder, master_bias):
 
     Parameters
     ----------
-    flat_folder -- String with path to flat folder.
-        out_folder -- Sring with path to folder to write resulting file.
-        master_bias -- String with path to master bias.
+        flat_folder : str
+            Path to flat folder.
+        out_folder : str
+            Path to folder to write resulting file.
+        master_bias : str  
+            Path to master bias.
 
-    Return:
-        file_name -- String with name of resulting file.
+    Returns
+    -------
+        file_name : str 
+            Name of resulting file.
     """
     current_folder = os.getcwd()
     os.chdir(flat_folder)
@@ -342,12 +369,17 @@ def make_MasterFlat_all(flats_folder, out_folder, master_bias):
 
     Parameters
     ----------
-    flats_folder -- String with path to the folder with the flats.
-        out_folder -- String with path to write flats.
-        master_bias -- String with path to master bias.
+        flats_folder : str 
+            Path to the folder with the flats.
+        out_folder : str 
+            Path to write flats.
+        master_bias : str
+            Path to master bias.
 
-    Return:
-        mflat_dict -- Dictionary containing path to each flat of each filter.
+    Returns
+    -------
+        mflat_dict : dict
+            Paths to each flat of each filter.
     """
 
     current_folder = os.getcwd()
@@ -373,12 +405,17 @@ def ccdproc(image_file, out_path, master_bias, master_flat):
 
     Parameters
     ----------
-    image_file -- String containing FITS file path.
-        out_path -- String with exit name for generated file.
-        master_bias -- String with path to master bias.
-        master_flat -- String with path to master flat.
+        image_file : str 
+            Path of FITS file.
+        out_path : str 
+            Exit name for generated file.
+        master_bias : str
+            Path to master bias.
+        master_flat : str 
+            Path to master flat.
 
-    Return:
+    Returns
+    -------
         None.
     """
     mbias = fits.getdata(master_bias)
@@ -409,12 +446,17 @@ def ccdproc_all(folder_path, out_path, master_bias, master_flat):
 
     Parameters
     ----------
-    folder_path -- String with path to folder.
-        out_path -- String wit path to exit folder.
-        master_bias -- String with path to master bias.
-        master_flat -- String with path to master flat.
+        folder_path : str 
+            Path to folder.
+        out_path : str 
+            Path to exit folder.
+        master_bias : str
+            Path to master bias.
+        master_flat : str
+            Path to master flat.
 
-    Return:
+    Returns
+    -------
         None.
     """
     current_folder = os.getcwd()
@@ -443,12 +485,17 @@ def ccdproc_all_filters(folder_path, out_path, master_bias, master_flat_dict):
 
     Parameters
     ----------
-    folder_path -- String with path to folder.
-        out_path -- String wit path to exit folder.
-        master_bias -- String with path to master bias.
-        master_flat_dict -- Dictinary to be returned out of make_MasterFlat_all.
+        folder_path : str
+            Path to folder.
+        out_path : str 
+            Path to exit folder.
+        master_bias : str 
+            Path to master bias.
+        master_flat_dict : dict
+            to be returned out of make_MasterFlat_all.
 
-    Return:
+    Returns
+    -------
         None.
     """
     current_folder = os.getcwd()
@@ -464,7 +511,7 @@ def ccdproc_all_filters(folder_path, out_path, master_bias, master_flat_dict):
     os.chdir(current_folder)
 
 
-def initial_reduction(observation_folder="./", backup=True):
+def initial_reduction(observation_folder="./"):
     """
     Complete initial processing of observation folder. It organizes files on
     folders both by object and filter, generate master calibration files, apply
@@ -477,9 +524,11 @@ def initial_reduction(observation_folder="./", backup=True):
 
     Parameters
     ----------
-    observation_folder -- String with path to the folder with files from
-                              night run.
-    Return:
+        observation_folder : str 
+            Path to the folder with files from night run.
+
+    Returns
+    -------
         None.
     """
     # Implement backup functionality here
