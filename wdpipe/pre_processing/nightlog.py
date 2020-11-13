@@ -15,6 +15,7 @@ Basic usage:
 import ccdproc
 import pandas as pd
 import os
+from pathlib import Path
 
 def get_log(folder, extra_keys=[]):
     """
@@ -44,7 +45,8 @@ def get_log(folder, extra_keys=[]):
 
     """
 
-    out=f"{folder}/{folder}_night.log"
+    out = f"{folder}/{folder}_night.log"
+    out = Path(out)
 
     keys = ["DATE-OBS", "OBJECT", "FILTER", 
             "EXPTIME", "AIRMASS", "COMMENT"]
@@ -92,8 +94,9 @@ def get_summary(table_file):
 
     """
     
-    out = table_file.split(".")[0] + ".summary"
-    date = table_file.split("/")[0]
+    out = str(table_file).split(".")[0] + ".summary"
+    out = Path(out)
+    date = str(table_file).split("/")[0]
 
 
     # Load table
@@ -180,6 +183,8 @@ def get_summary(table_file):
 
     with open(out, "w") as f:
         f.write("".join(text))
+
+    return out
 
 
 if __name__ == "__main__":
