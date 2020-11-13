@@ -17,7 +17,7 @@ import pandas as pd
 import os
 from pathlib import Path
 
-def get_log(folder, extra_keys=[]):
+def get_log(folder, extra_keys=[], write=True):
     """
     Given a folder, it generate a log file with the listing of the keys given
     on the keys parameter. Default are the keys from OPD.
@@ -31,6 +31,9 @@ def get_log(folder, extra_keys=[]):
     extra_keys : List
         Listing of keys to look at in order, in addition to the default ones.
 
+    write : bool
+        If True writes an output csv (default is True)>
+
     Retuns
     ------
 
@@ -41,12 +44,13 @@ def get_log(folder, extra_keys=[]):
     --------------------
 
     Write to disk a file named w/ the folder name + "_night.log" containing the 
-    log inside the folder.
+    log inside the folder when write is True.
 
     """
 
-    out = f"{folder}/{folder}_night.log"
-    out = Path(out)
+    out = Path(folder)
+    out = out / f"{str(out)}_night.log"
+
 
     keys = ["DATE-OBS", "OBJECT", "FILTER", 
             "EXPTIME", "AIRMASS", "COMMENT"]
@@ -67,7 +71,8 @@ def get_log(folder, extra_keys=[]):
     for key in cleaners:
         df[key] = df[key].apply(cleaners[key])
 
-    df.to_csv(out)
+    if write:
+        df.to_csv(out)
 
     return [df, out]
 
