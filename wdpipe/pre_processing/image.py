@@ -14,21 +14,21 @@ from datetime import datetime as dt
 
 def move_files(files, destination):
     """
-    Move list of files to specified destination.
+    move list of files to specified destination.
 
-    Parameters
+    parameters
     ----------
-        files : List-like object containing strings 
-            Addresses of files.
+        files : list-like object containing strings 
+            addresses of files.
         destination : str
-            Destination folder.
+            destination folder.
 
-    Returns
+    returns
     -------
-        None.
+        none.
     """
     quantity = len(files)
-    print("Moving", quantity, "files... \n")
+    print("moving", quantity, "files... \n")
 
     for i, file in enumerate(files, start=1):
         print("%s ====> %s/%s (%i de %i)" %
