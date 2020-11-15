@@ -1,4 +1,4 @@
-"""file_organization - Functions to help organize files using the log file
+"""Functions to help organize files using the log file
 
 """
 from pathlib import Path
