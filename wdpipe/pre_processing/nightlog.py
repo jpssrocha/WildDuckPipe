@@ -84,7 +84,7 @@ def get_summary(table_file):
     Parameters
     ----------
 
-    table_file : String
+    table_file : pathlib.Path object
         Path to the log table.
 
     Retuns
@@ -98,9 +98,14 @@ def get_summary(table_file):
     Write text file w/ the table_file name + ".summary"
 
     """
+
+    out = table_file
+    out.rename(out.with_suffix(".summary"))
+
+
     
-    out = str(table_file).split(".")[0] + ".summary"
-    out = Path(out)
+    #out = str(table_file).split(".")[0:-1] + ".summary"
+    #out = Path(out)
     date = str(table_file).split("/")[0]
 
 
