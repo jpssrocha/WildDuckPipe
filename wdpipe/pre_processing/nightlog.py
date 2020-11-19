@@ -32,7 +32,7 @@ def get_log(folder, extra_keys=[], write=True):
         Listing of keys to look at in order, in addition to the default ones.
 
     write : bool
-        If True writes an output csv (default is True)>
+        If True writes an output csv (default is True).
 
     Retuns
     ------
@@ -74,7 +74,7 @@ def get_log(folder, extra_keys=[], write=True):
     if write:
         df.to_csv(out)
 
-    return [df, out]
+    return [df, str(out)]
 
 
 def get_summary(table_file):
@@ -99,15 +99,11 @@ def get_summary(table_file):
 
     """
 
-    out = table_file
-    out.rename(out.with_suffix(".summary"))
-
-
+    exit = Path(table_file)
     
-    #out = str(table_file).split(".")[0:-1] + ".summary"
-    #out = Path(out)
-    date = str(table_file).split("/")[0]
-
+    exit = exit.with_suffix(".summary")
+    
+    date = table_file.split("/")[0]
 
     # Load table
     table = pd.read_csv(table_file)
@@ -191,10 +187,10 @@ def get_summary(table_file):
 
     print("".join(text))
 
-    with open(out, "w") as f:
+    with open(exit, "w") as f:
         f.write("".join(text))
 
-    return out
+    return exit
 
 
 if __name__ == "__main__":
