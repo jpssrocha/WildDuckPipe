@@ -65,7 +65,8 @@ def get_log(folder, extra_keys=[], write=True):
 
     cleaners = {"COMMENT": lambda value: value.split("'")[1].strip(),
                 "EXPTIME": lambda value: int(value.split(",")[0]),
-                "OBJECT": lambda value: value.replace(" ", "")
+                "OBJECT": lambda value: value.replace(" ", ""),
+                "FILTER": lambda value: value.upper()
                 }
 
     for key in cleaners:
