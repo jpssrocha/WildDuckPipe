@@ -175,8 +175,7 @@ def organize_nightrun(folder, out_location=None):
         "root": root,
         "bias": root / "calibration/bias",
         "flat": root / "calibration/flat",
-        "master": root / "calibration/master",
-        "raw": root/ "raw",
+        "master": root / "master",
         "reduced": root / "reduced"
     }
     

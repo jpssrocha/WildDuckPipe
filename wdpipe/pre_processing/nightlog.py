@@ -51,6 +51,12 @@ def get_log(folder, extra_keys=[], write=True):
     out = Path(folder)
     out = out / f"{str(out)}_night.log"
 
+    #  Check if there are fles
+
+    if len(list(out.glob("*.fits"))) == 0:
+        print("ERROR: No files found, can't create log dataframe for orientation. Returning None")
+        return None
+
 
     keys = ["DATE-OBS", "OBJECT", "FILTER", 
             "EXPTIME", "AIRMASS", "COMMENT"]
@@ -61,12 +67,20 @@ def get_log(folder, extra_keys=[], write=True):
     
     df = ifc.summary.to_pandas(index="file")
 
-    # Cleaning OPD comment and exptime. Then removing spaces from object.
+    # Cleaning OPD comment and exptime. Then standardizing OBJECT and FILTER.
+
+    def standardize(value):
+        """
+        Put values on standard way for folder creation by removing certain 
+        characteres, and having it in upper case. (str -> str)
+        """
+        translator = str.maketrans({" ": "", "\\": "-", "/": "-"})
+        return value.translate(translator).upper()
 
     cleaners = {"COMMENT": lambda value: value.split("'")[1].strip(),
                 "EXPTIME": lambda value: int(value.split(",")[0]),
-                "OBJECT": lambda value: value.replace(" ", ""),
-                "FILTER": lambda value: value.upper()
+                "OBJECT": standardize,
+                "FILTER": standardize
                 }
 
     for key in cleaners:
@@ -115,8 +129,8 @@ def get_summary(table_file):
 
     count = lambda tab, key, value: (tab[key] == value).sum()
 
-    bias = count(table, "OBJECT", "bias")
-    flat = count(table, "OBJECT", "flat")
+    bias = count(table, "OBJECT", "BIAS")
+    flat = count(table, "OBJECT", "FLAT")
     n_sci = count(table, "COMMENT", "science")
 
     calib = flat + bias
@@ -139,7 +153,7 @@ def get_summary(table_file):
 
         return strings
 
-    flat_sub = count_subset(table, "OBJECT", "flat", "FILTER")
+    flat_sub = count_subset(table, "OBJECT", "FLAT", "FILTER")
 
     # Science images
 
