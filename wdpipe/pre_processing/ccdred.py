@@ -251,7 +251,6 @@ def ccdred(image_file, mbias_path, mflat_path):
 
     image_indices = _check_image_extensions(hdul)
     
-    
     #  Looping over extensions
     for i in image_indices:
         
@@ -267,7 +266,7 @@ def ccdred(image_file, mbias_path, mflat_path):
         image = ccdproc.flat_correct(image, flat, norm_value=1) 
         #  norm_value = 1 cause flat is already normalized
 
-        #  Writing changes to the master bias file
+        #  Writing changes
         hdul[i].header.append(("CCDPROC", "True"))
 
         fits.update(
