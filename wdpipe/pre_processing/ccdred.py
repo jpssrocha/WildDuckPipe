@@ -29,8 +29,8 @@ def _check_image_extensions(hdul):
         index_list : list
             Indexes of image extensions.
     """
-    image_indices = np.arange(len(hdus))
-    selection = [hdu.size > 0 for hdu in hdus]
+    image_indices = np.arange(len(hdul))
+    selection = [hdu.size > 0 for hdu in hdul]
     index_list = image_indices[selection]
 
     return index_list
@@ -64,9 +64,7 @@ def correct_overscan(file_path):
     for i in image_indices:
         #  Aborting if the keyword 'BIASSEC' isn't defined
         if not ('BIASSEC' in hdul[i].header): 
-            print( f"""Skipping overscan correction on: {file:1s}[{i:1.0f}]
-                    - BIASSEC keyword not found"""
-                )
+            print(f"Skipping overscan correction on: {file_path:1s}[{i:1.0f}] - BIASSEC keyword not found")
             continue
 
         img = CCDData(
@@ -105,39 +103,102 @@ def correct_overscan(file_path):
     hdul.close()
 
 
+def make_mbias(file_list, out_path):
+    """
+    Given a list of bias image files, combine then into master bias using
+    sigma clipping algorithm.  It is expected that the files are already
+    pre-processed (overscan, trim, ...).
+    
+    Arguments
+    ---------
+    
+        file_list : list of str
+            Paths for the files.
+            
+        out_path : pathlib.Path 
+            Location to put new image
+        
+    File transformations
+    --------------------
+    
+       Write master bias FITS on out_pathname
+    
+    
+    Returns
+    -------
+        out_pathname : str
+            Path to the generated file.
+    """
+    
+    out_pathname = out_path /  "master_bias.fits"
+    
+    if out_pathname.exists():
+        print(f"File: {str(out_pathname)} already exists.  Exiting the function.")
+        return str(out_pathname)
+    else:
+        out_pathname = str(out_pathname)
+    
+    #  Checking HDU for the image extensions
+    with fits.open(file_list[0]) as hdus:
+        image_indices = _check_image_extensions(hdus)
+    
+    #  Generating dummy file using the first bias image
+    mbias = fits.open(file_list[0])
+    mbias.writeto(out_pathname)
+    
+    #  Looping over extensions
+    for i in image_indices:
 
-    def _center_inv_median(image_matrix):
-        """
-        Given an image return the inverse of the median from the central region
-        of the image (1/4 of the image). To use whithin the make_mflat function.
-        
-        Arguments
-        ---------
-            image_matrix : 2D np.array
-                matrix of the image.
-                
-        Returns
-        -------
-            inv_med : float
-                Inverse of the central region median
-        """
-        #  Orientation
-        y, x = image_matrix.shape
-        y, x = int(y/2), int(x/2) # Center
-        dy, dx = int(y/2), int(x/2) # Step
-        
-        #  Limits
-        a, b = y - dy, y + dy
-        c, d = x - dx, x + dy
-        
-        roi = image_matrix[a:b, c:d]
-        
-        inv_med = 1/np.median(roi)
-        
-        return inv_med
+        #  Loading images of an extension
+        ccd_list = [CCDData.read(image_file, hdu=i, unit="adu") for image_file in file_list]
+
+        #  Combining images
+        comb = ccdproc.Combiner(ccd_list)
+        comb.sigma_clipping(low_thresh=3, high_thresh=3, func=np.ma.median)
+        comb_bias = comb.average_combine()
+
+        #  Writing changes to the master bias file
+        mbias[i].header.append(('NCOMBINE', len(ccd_list), '# images combined'))
+        fits.update(out_pathname, comb_bias.data, header=mbias[i].header, ext=i)
+    
+    mbias.close()
+    print(f"Processed master bias:  {out_pathname}")
+    
+    return out_pathname
+
+
+def _center_inv_median(image_matrix):
+    """
+    Given an image return the inverse of the median from the central region
+    of the image (1/4 of the image). To use whithin the make_mflat function.
+    
+    Arguments
+    ---------
+        image_matrix : 2D np.array
+            matrix of the image.
+            
+    Returns
+    -------
+        inv_med : float
+            Inverse of the central region median
+    """
+    #  Orientation
+    y, x = image_matrix.shape
+    y, x = int(y/2), int(x/2) # Center
+    dy, dx = int(y/2), int(x/2) # Step
+    
+    #  Limits
+    a, b = y - dy, y + dy
+    c, d = x - dx, x + dy
+    
+    roi = image_matrix[a:b, c:d]
+    
+    inv_med = 1/np.median(roi)
+    
+    return inv_med
     
     
-def make_mflat(file_list, mbias_path, out_path, filter, out_name="master_flat"):
+def make_mflat(file_list, mbias_path, out_path, filter):
     """
     Given a list of flat image files, combine then into master flat using
     sigma clipping algorithm, on the images after normalizing by the median. It
@@ -158,9 +219,6 @@ def make_mflat(file_list, mbias_path, out_path, filter, out_name="master_flat"):
         filter: str
             Name of filter (used to generate out filename)
         
-        out_name : str
-            Name of output file. (default is master_flat_<filter>)
-            
     File transformations
     --------------------
     
@@ -173,7 +231,7 @@ def make_mflat(file_list, mbias_path, out_path, filter, out_name="master_flat"):
             Path to the generated file.
     """
     
-    out_pathname = out_path / (out_name + f"_{filter}.fits") 
+    out_pathname = out_path / f"master_flat_{filter}.fits"
     
     if out_pathname.exists():
         print(f"File: {str(out_pathname)} already exists.  Exiting the function.")
@@ -274,6 +332,6 @@ def ccdred(image_file, mbias_path, mflat_path):
                 ext=i
                 )
         
-        print(f"Processed file: {image_file:1s}[{i:1.0f}")
+        print(f"Processed file: {image_file:1s}[{i:1.0f}]")
         
     hdul.close()

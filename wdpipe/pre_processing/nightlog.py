@@ -49,7 +49,6 @@ def get_log(folder, extra_keys=[], write=True):
     """
 
     out = Path(folder)
-    out = out / f"{str(out)}_night.log"
 
     #  Check if there are fles
 
@@ -57,6 +56,7 @@ def get_log(folder, extra_keys=[], write=True):
         print("ERROR: No files found, can't create log dataframe for orientation. Returning None")
         return None
 
+    out = out / f"{str(out)}_night.log"
 
     keys = ["DATE-OBS", "OBJECT", "FILTER", 
             "EXPTIME", "AIRMASS", "COMMENT"]

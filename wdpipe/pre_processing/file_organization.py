@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 from . import nightlog
 from ..utils.context_managers import indir
-
+from shutil import copyfile, move
 
 def copy_files(files, destination):
     """
@@ -28,13 +28,12 @@ def copy_files(files, destination):
     --------------------
         Write copies of the files to destination
     """
-    from shutil import copyfile
     quantity = len(files)
     print(f"Copying {quantity} files... \n")
 
     for i, file in enumerate(files, start=1):
-        print(f"{file} ====> {destination}/{file} ({i} de {quantity})")
-        copyfile(file, destination + "/" + file)
+        print(f"{file} ====> {destination}/{file.split('/')[-1]} ({i} de {quantity})")
+        copyfile(file, destination / str(file).split("/")[-1])
     print("\n")
 
 
@@ -58,7 +57,6 @@ def move_files(files, destination):
     -------
         None.
     """
-    from shutil import move
     quantity = len(files)
     print(f"Moving {quantity} files... \n")
 
@@ -155,6 +153,10 @@ def organize_nightrun(folder, out_location=None):
     
     """
     
+    #  Small fix to avoid bug due to lacking \ or /
+    folder.strip("\\").strip("/")
+    folder = f"{folder}/"
+
     #  Create log for folder
     
     print(f"Getting log for {folder} ... \n")
@@ -190,8 +192,8 @@ def organize_nightrun(folder, out_location=None):
     
     #  Select files into lists
     
-    bias = log[log["OBJECT"] == "bias"].index #  Index col is the filename
-    flats = log[log["OBJECT"] == "flat"].index
+    bias = log[log["OBJECT"] == "BIAS"].index #  Index col is the filename
+    flats = log[log["OBJECT"] == "FLAT"].index
     sci = log[log["COMMENT"] == "science"].index
     
     print("Copying bias ...\n")
@@ -204,7 +206,7 @@ def organize_nightrun(folder, out_location=None):
 
     print("Copying science images ...\n")
         
-    copy_files(folder + sci, folders["raw"])
+    copy_files(folder + sci, folders["reduced"])
     
     #   Organize flat files
     

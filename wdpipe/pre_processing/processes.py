@@ -5,6 +5,8 @@ the code from this sub-package.
 from . import ccdred
 from .nightlog import get_log
 from .file_organization import organize_nightrun, sep_by_kw
+from pathlib import Path
+from shutil import rmtree
 
 def initial_reduction(nightrun_folder):
     """
@@ -21,7 +23,7 @@ def initial_reduction(nightrun_folder):
 
     File transformations
     --------------------
-        Create a copy of all files, organize them into a folder structure,
+        Create a copy of all files, organize them into a folder tree,
         create master files and overwrite all files with the calibrations
         applied.
 
@@ -30,13 +32,13 @@ def initial_reduction(nightrun_folder):
         None
     """
 
-    print(f"Starting to process folder {nightrun_folder}")
+    print(f"Starting to process folder {nightrun_folder} \n")
     
     folders = organize_nightrun(nightrun_folder)
 
     # Correcting bias and combining into master
 
-    print(f"Processing bias images into master bias")
+    print(f"\nProcessing bias images.\n")
 
     bias_list = [str(path) for path in folders["bias"].glob("*.fits")]
 
@@ -47,27 +49,27 @@ def initial_reduction(nightrun_folder):
 
     #  Correcting flats and combining into masters
 
-    print("Processing flat images")
+    print("\nProcessing flat images. \n")
 
     mflats = {}
-    for filt in structure["flat"]:
-        flat_list = [str(path) for path in structure["flat"][filt].glob("*.fits")]
+    for filt in folders["flat"]:
+        flat_list = [str(path) for path in folders["flat"][filt].glob("*.fits")]
         for im in flat_list:
             ccdred.correct_overscan(im)
-        mflats.update(ccdred.make_mflat(flat_list, mbias, structure["master"], filt))
+        mflats.update(ccdred.make_mflat(flat_list, mbias, folders["master"], filt))
     
 
     #  Correct overscan of sci images
 
     sci_list = [str(path) for path in folders["reduced"].glob("*.fits")]
 
-    print(f"Processing {len(sci_list)} science images")
+    print(f"\nProcessing {len(sci_list)} science images. \n")
 
     for im in sci_list:
         ccdred.correct_overscan(im)
 
 
-    log_df, _ = get_log(structure["reduced"], write=False)
+    log_df, _ = get_log(folders["reduced"], write=False)
 
     #  Find unique filters
     uniq = log_df["FILTER"].unique()
@@ -79,14 +81,14 @@ def initial_reduction(nightrun_folder):
         files = log_df[log_df["FILTER"] == filt].index
         #  Apply ccdproc
         for file in files:
-            ccdred.ccdred(str(structure["reduced"] / file), mbias, mflats[filt])
+            ccdred.ccdred(str(folders["reduced"] / file), mbias, mflats[filt])
 
     # Organize final results
-    log_df, _ = get_log(structure["reduced"], write=False)
+    log_df, _ = get_log(folders["reduced"], write=False)
 
     # Organize objects
     print("Organizing final files into objects.")
-    objects = sep_by_kw(structure["reduced"], "OBJECT")
+    objects = sep_by_kw(folders["reduced"], "OBJECT")
 
     for obj, path in objects.items():
         # Separate object by filter
@@ -100,24 +102,26 @@ def initial_reduction(nightrun_folder):
 
     # Converting to path object
 
-    from pathlib import Path
-    from shutil import rmtree
-
     mbias = Path(mbias)
+    
+    for filter in mflats:
+        mflats[filter] = Path(mflats[filter])
 
     # Check existance of file
 
-    if mbias.exists():
-        rmtree(folders["bias"])
+    print("\nCleaning up calibration files. \n")
 
     n = 0
-    for flat, filter in mflats.items():
+    if mbias.exists():
+        rmtree(folders["bias"])
+        n += 1
+
+    for filter, flat in mflats.items():
         if flat.exists():
             rmtree(folders["flat"][filter])
             n += 1
 
-    if len(mflats) == n:
-        rmtree(folders["flat"])
+    if len(mflats) + 1 == n:
+        rmtree(folders["bias"].parent)
 
-
-
+    print("Processing finished.")
