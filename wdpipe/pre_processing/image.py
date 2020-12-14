@@ -1,4 +1,6 @@
 """
+DEPRECATED.
+
 Library containing functions related to the reduction of astronomical images.
 Optimized to use with the standard adopted on mission OI2018B-011 from OPD/LNA
 """
