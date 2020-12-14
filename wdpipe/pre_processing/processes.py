@@ -2,8 +2,7 @@
 Module containing the utility functions to perform automated reduction using
 the code from this sub-package.
 """
-import .ccdred
-import .nightlog
+from . import ccdred
 from .nightlog import get_log
 from .file_organization import organize_nightrun, sep_by_kw
 
@@ -53,7 +52,7 @@ def initial_reduction(nightrun_folder):
     mflats = {}
     for filt in structure["flat"]:
         flat_list = [str(path) for path in structure["flat"][filt].glob("*.fits")]
-        for im in flat_list
+        for im in flat_list:
             ccdred.correct_overscan(im)
         mflats.update(ccdred.make_mflat(flat_list, mbias, structure["master"], filt))
     

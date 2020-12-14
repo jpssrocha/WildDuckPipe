@@ -6,7 +6,6 @@ Module containing CCD image reduction routines:
 
 """
 import pandas as pd
-import .nightlog
 from pathlib import Path
 import os
 from astropy.io import fits
@@ -108,35 +107,34 @@ def correct_overscan(file_path):
 
 
     def _center_inv_median(image_matrix):
-    """
-    Given an image return the inverse of the median from the central region
-    of the image (1/4 of the image). To use whithin the make_mflat function.
-    
-    Arguments
-    ---------
-        image_matrix : 2D np.array
-            matrix of the image.
-            
-    Returns
-    -------
-        inv_med : float
-            Inverse of the central region median
-    """
-    
-    #  Orientation
-    y, x = image_matrix.shape
-    y, x = int(y/2), int(x/2) # Center
-    dy, dx = int(y/2), int(x/2) # Step
-    
-    #  Limits
-    a, b = y - dy, y + dy
-    c, d = x - dx, x + dy
-    
-    roi = image_matrix[a:b, c:d]
-    
-    inv_med = 1/np.median(roi)
-    
-    return inv_med
+        """
+        Given an image return the inverse of the median from the central region
+        of the image (1/4 of the image). To use whithin the make_mflat function.
+        
+        Arguments
+        ---------
+            image_matrix : 2D np.array
+                matrix of the image.
+                
+        Returns
+        -------
+            inv_med : float
+                Inverse of the central region median
+        """
+        #  Orientation
+        y, x = image_matrix.shape
+        y, x = int(y/2), int(x/2) # Center
+        dy, dx = int(y/2), int(x/2) # Step
+        
+        #  Limits
+        a, b = y - dy, y + dy
+        c, d = x - dx, x + dy
+        
+        roi = image_matrix[a:b, c:d]
+        
+        inv_med = 1/np.median(roi)
+        
+        return inv_med
     
     
 def make_mflat(file_list, mbias_path, out_path, filter, out_name="master_flat"):
@@ -184,7 +182,7 @@ def make_mflat(file_list, mbias_path, out_path, filter, out_name="master_flat"):
         out_pathname = str(out_pathname)
     
     #  Checking first HDUList for the image extensions
-    with fits.open(file_list[0]) as hdus
+    with fits.open(file_list[0]) as hdus:
         image_indices = _check_image_extensions(hdus)
 
     #  Generating dummy file using the first image
