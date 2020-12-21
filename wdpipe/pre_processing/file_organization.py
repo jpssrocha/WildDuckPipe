@@ -32,9 +32,6 @@ def copy_files(files, destination, overwrite=False):
         Write copies of the files to destination
     """
 
-    # Check if destination exists
-
-
     quantity = len(files)
     print(f"Copying {quantity} files... \n")
 
