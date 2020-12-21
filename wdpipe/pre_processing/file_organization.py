@@ -17,7 +17,7 @@ def copy_files(files, destination, overwrite=False):
         files : List-like object with strings
             List containing strings with the address of files to copy.
 
-        destination : str
+        destination : pathlib.Path object
             Destination folder.
 
         overwrite : bool 
@@ -34,16 +34,16 @@ def copy_files(files, destination, overwrite=False):
 
     # Check if destination exists
 
-    dest = Path(destination)
-    if dest.exists() and not overwrite:
-        print(f".Skipping {destination}: File already exists")
-        return None
 
     quantity = len(files)
     print(f"Copying {quantity} files... \n")
 
     for i, file in enumerate(files, start=1):
         print(f"{file} ====> {destination}/{file.split('/')[-1]} ({i} de {quantity})")
+        dest = destination / str(file)
+        if dest.exists() and not overwrite:
+            print(f".Skipping {destination}: File already exists")
+            pass
         copyfile(file, destination / str(file).split("/")[-1])
     print("\n")
 
