@@ -42,9 +42,6 @@ def initial_reduction(nightrun_folder):
 
     bias_list = [str(path) for path in folders["bias"].glob("*.fits")]
 
-    for im in bias_list:
-        ccdred.correct_overscan(im)
-
     mbias = ccdred.make_mbias(bias_list, folders["master"])
 
     #  Correcting flats and combining into masters
@@ -54,8 +51,6 @@ def initial_reduction(nightrun_folder):
     mflats = {}
     for filt in folders["flat"]:
         flat_list = [str(path) for path in folders["flat"][filt].glob("*.fits")]
-        for im in flat_list:
-            ccdred.correct_overscan(im)
         mflats.update(ccdred.make_mflat(flat_list, mbias, folders["master"], filt))
     
 
