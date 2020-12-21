@@ -8,7 +8,7 @@ from . import nightlog
 from ..utils.context_managers import indir
 from shutil import copyfile, move
 
-def copy_files(files, destination):
+def copy_files(files, destination, overwrite=False):
     """
     Move list of files to specified destination.
 
@@ -20,6 +20,9 @@ def copy_files(files, destination):
         destination : str
             Destination folder.
 
+        overwrite : bool 
+            Overwrite or not. Default False (not overwrite)
+
     Returns
     -------
         None.
@@ -28,6 +31,14 @@ def copy_files(files, destination):
     --------------------
         Write copies of the files to destination
     """
+
+    # Check if destination exists
+
+    dest = Path(destination)
+    if dest.exists() and not overwrite:
+        print(f".Skipping {destination}: File already exists")
+        return None
+
     quantity = len(files)
     print(f"Copying {quantity} files... \n")
 
