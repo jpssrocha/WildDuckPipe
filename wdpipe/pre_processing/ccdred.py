@@ -198,7 +198,7 @@ def _center_inv_median(image_matrix):
     return inv_med
     
     
-def make_mflat(file_list, mbias_path, out_path, filter):
+def make_mflat(file_list, mbias_path, out_path, filter, scaling_func=_center_inv_median):
     """
     Given a list of flat image files, combine then into master flat using
     sigma clipping algorithm, on the images after normalizing by the median. It
@@ -216,8 +216,12 @@ def make_mflat(file_list, mbias_path, out_path, filter):
         out_path : pathlib.Path 
             Location to put new image
             
-        filter: str
+        filter : str
             Name of filter (used to generate out filename)
+
+        scaling_func : function or list of values
+            Function or values to scale individual images. Default is
+            _center_inv_median, which is defined on this module.
         
     File transformations
     --------------------
@@ -259,7 +263,7 @@ def make_mflat(file_list, mbias_path, out_path, filter):
 
         #  Combining images
         comb = ccdproc.Combiner(ccd_list)
-        comb.scaling = _center_inv_median # Scalling using custom function
+        comb.scaling = scaling_func #  Scalling using custom function
         comb.sigma_clipping(low_thresh=3, high_thresh=3, func=np.ma.median)
         comb_image = comb.average_combine()
 
@@ -314,12 +318,12 @@ def ccdred(image_file, mbias_path, mflat_path):
             print(f"Skipping image: {image_file:1s}[{i:1.0f}] - Already processed.")
             continue
         
-        bias = CCDData.read(mbias_path, hdu=i, unit="adu")  
-        flat = CCDData.read(mflat_path, hdu=i, unit="adu") 
+        master_bias = CCDData.read(mbias_path, hdu=i, unit="adu")  
+        master_flat = CCDData.read(mflat_path, hdu=i, unit="adu") 
         image = CCDData.read(image_file, hdu=i, unit="adu")
         
-        image = ccdproc.subtract_bias(image, bias)
-        image = ccdproc.flat_correct(image, flat, norm_value=1) 
+        image = ccdproc.subtract_bias(image, master_bias)
+        image = ccdproc.flat_correct(image, master_flat, norm_value=1) 
         #  norm_value = 1 cause flat is already normalized
 
         #  Writing changes
