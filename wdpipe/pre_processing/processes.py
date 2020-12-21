@@ -12,7 +12,7 @@ def initial_reduction(nightrun_folder):
     """
     Given a folder perform all the initial reduction process:
         - Organize files
-        - Generate masters
+        - Generate masters (bias, flat)
         - Correct overscan
         - Apply masters calibration files
 
