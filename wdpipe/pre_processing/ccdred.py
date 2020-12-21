@@ -103,6 +103,47 @@ def correct_overscan(file_path):
     hdul.close()
 
 
+def _correct_overscan_hdu(hdu_ccd):
+    """
+    Given an HDU loaded as a CCDData object perform overscan correction.
+
+    Arguments
+    ---------
+
+        hdu_ccd : astropy.nddata.CCDData
+            HDU to perform correction
+
+    Returns
+    -------
+        
+        img_trim : astropy.nddata.CCDData
+            Corrected HDU
+    """
+
+    img_osub = (
+            ccdproc.subtract_overscan(
+                hdu_ccd, 
+                fits_section=hdu_ccd.header['BIASSEC'],
+                model=None,
+                median=True,
+                add_keyword={'overscan': True, 'calstat': 'O'})
+            )
+
+    img_trim = (
+            ccdproc.trim_image(
+                img_osub,
+                fits_section=img_osub.header['TRIMSEC'], 
+                add_keyword={'trimmed': True, 'calstat': 'OT'})
+            )
+
+    #  Updating header and overwriting processed image
+    del img_trim.header['BIASSEC']
+    del img_trim.header['TRIMSEC']
+
+    return img_trim
+
+
+
 def make_mbias(file_list, out_path):
     """
     Given a list of bias image files, combine then into master bias using
@@ -151,6 +192,13 @@ def make_mbias(file_list, out_path):
 
         #  Loading images of an extension
         ccd_list = [CCDData.read(image_file, hdu=i, unit="adu") for image_file in file_list]
+
+        #  Correct overscan
+        if not ('BIASSEC' in ccd_list[0].header): 
+            print(f".Skipping bias overscan correction on: index [{i:1.0f}] - BIASSEC keyword not found")
+        else:
+            for im in ccd_list:
+                im = _correct_overscan_hdu(im)
 
         #  Combining images
         comb = ccdproc.Combiner(ccd_list)
@@ -254,12 +302,18 @@ def make_mflat(file_list, mbias_path, out_path, filter, scaling_func=_center_inv
     #  Looping over extensions
     for i in image_indices:
         
-        bias = CCDData.read(mbias_path, hdu=i, unit="adu")  #  Master bias
+        master_bias = CCDData.read(mbias_path, hdu=i, unit="adu")  #  Master bias
         #  Loading images of an extension
         ccd_list = [CCDData.read(image_file, hdu=i, unit="adu") for image_file in file_list]
         
         for image in ccd_list:
-            image = ccdproc.subtract_bias(image, bias)
+            image = ccdproc.subtract_bias(image, master_bias)
+
+        if not ('BIASSEC' in ccd_list[0].header): 
+            print(f".Skipping flat overscan correction on: index [{i:1.0f}] - BIASSEC keyword not found")
+        else:
+            for im in ccd_list:
+                im = _correct_overscan_hdu(im)
 
         #  Combining images
         comb = ccdproc.Combiner(ccd_list)
