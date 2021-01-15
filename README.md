@@ -53,6 +53,8 @@ and so on.
 
 ## Image processing tools
 
+- Overscan and trim correction (Done)
+
 - Generation of master calibration images (Done)
     - Master Bias (Done)
     - Master Normalized Flat (Done)
@@ -63,7 +65,7 @@ and so on.
     - Iraf CCDPROC like task (re implementing using astropy's ccdproc)
 
 - Image alignment
-    - For rich fields (e.g. stellar clusters) (astroalign) (Done)
+    - For rich fields (e.g. stellar clusters) (astroalign) (To re implement to work w/ MEF'S)
     - For poor fields (e.g. field variable star) (IRAF's imalign like)
 
 - Image combination (To re implement using ccdproc)
