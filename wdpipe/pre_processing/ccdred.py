@@ -331,15 +331,16 @@ def make_mflat(file_list, mbias_path, out_path, filter, scaling_func=_center_inv
     return {filter : out_pathname}
 
 
-def ccdred(image_file, mbias_path, mflat_path):
+def ccdred_list(image_path_list, mbias_path, mflat_path):
     """
-    Given a FITS file apply master calibration files.
+    Given a list of FITS files process it by applying master calibrations and
+    overscan.
     
     Arguments
     ---------
     
-        image_file : str
-            Path to the file to process
+        image_file : list like with strings
+            Path to the files to process
             
         mbias_path : str
             Path to the master bias
@@ -351,45 +352,73 @@ def ccdred(image_file, mbias_path, mflat_path):
     File transformations
     --------------------
     
-        Re-write FITS file, with overscan, bias and flat corrections and updated header.
+        Re-write FITS file, with overscan, bias and flat corrections and
+        updated header.
     
     
     Returns
     -------
         None
     """
-    
-    hdul = fits.open(image_file)
-    
-    #  Checking HDU for the image extensions
 
-    image_indices = _check_image_extensions(hdul)
-    
-    #  Looping over extensions
-    for i in image_indices:
-        
-        if ('CCDPROC' in hdul[i].header): 
-            print(f"Skipping image: {image_file:1s}[{i:1.0f}] - Already processed.")
-            continue
-        
-        master_bias = CCDData.read(mbias_path, hdu=i, unit="adu")  
-        master_flat = CCDData.read(mflat_path, hdu=i, unit="adu") 
-        image = CCDData.read(image_file, hdu=i, unit="adu")
-        
-        image = ccdproc.subtract_bias(image, master_bias)
-        image = ccdproc.flat_correct(image, master_flat, norm_value=1) 
-        #  norm_value = 1 cause flat is already normalized
+    #  Load masters
 
-        #  Writing changes
-        hdul[i].header.append(("CCDPROC", "True"))
+    master_bias = fits.open(mbias_path)  
+    master_flat = fits.open(mflat_path) 
 
-        fits.update(
-                image_file,
-                image.data.astype(np.float32),
-                header=hdul[i].header,
-                ext=i
-                )
+    image_indices = _check_image_extensions(master_bias)
+
+    for image_file in image_path_list:
+
+        #  Looping over extensions
+        for i in image_indices:
+
+            #  Get CCDData object for this extension
+            
+            ccd = CCDData.read(image_file, unit="adu", hdu=i)
+
+            mbias_ccd = CCDData(data=master_bias[i].data,
+                                header=master_bias[i].header, unit="adu")
+
+            mflat_ccd = CCDData(data=master_flat[i].data,
+                                header=master_flat[i].header, unit="adu")
+            
+            if 'CCDPROC' in ccd.header: 
+                print(f"Skipping image: {image_file:1s}[{i:1.0f}] - Already processed.")
+                continue
+
+            #  Overscan section variables
+
+            biassec = None
+            trimsec = None
+
+            if "BIASSEC" in ccd.header:
+                biassec = ccd.header["BIASSEC"]
+
+            if "TRIMSEC" in ccd.header:
+                trimsec = ccd.header["TRIMSEC"]
+            
+            # Applying corrections
+
+            ccd = ccdproc.ccd_process(
+                    ccd,
+                    oscan = biassec,
+                    trim = trimsec,
+                    master_bias = mbias_ccd,
+                    master_flat = mbias_ccd
+                    )
+
+            ##  Can add more information on the function above for the pixel by
+            ##  pixel error calculation (e.g. gain, read noise).
+
+            #  Updating existing image
+
+            ccd.header["CCDPROC"] = True  #  Added processed flag
+
+            fits.update(image_file, ccd.data, header=ccd.header, ext=i)
+
+            print(f"Processed image: {image_file}")
+
+    master_bias.close()
+    master_flat.close()
         
-        print(f"Processed file: {image_file:1s}[{i:1.0f}]")
-        
-    hdul.close()
