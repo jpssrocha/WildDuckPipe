@@ -415,7 +415,7 @@ def ccdred_list(image_path_list, mbias_path, mflat_path):
 
             ccd.header["CCDPROC"] = True  #  Added processed flag
 
-            fits.update(image_file, ccd.data, header=ccd.header, ext=i)
+            fits.update(image_file, ccd.data.astype(np.float32), header=ccd.header, ext=i)
 
             print(f"Processed image: {image_file}")
 
