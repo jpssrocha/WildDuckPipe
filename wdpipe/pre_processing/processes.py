@@ -73,10 +73,13 @@ def initial_reduction(nightrun_folder):
 
     for filt in uniq:
         # Take filenames on the filters
-        files = log_df[log_df["FILTER"] == filt].index
+        files = log_df[log_df["FILTER"] == filt].index.tolist()
+
+        files = [str(folders["reduced"] / file) for file in files]
+
+        breakpoint()
         #  Apply ccdproc
-        for file in files:
-            ccdred.ccdred(str(folders["reduced"] / file), mbias, mflats[filt])
+        ccdred.ccdred_list(files, mbias, mflats[filt])
 
     # Organize final results
     log_df, _ = get_log(folders["reduced"], write=False)
