@@ -77,7 +77,6 @@ def initial_reduction(nightrun_folder):
 
         files = [str(folders["reduced"] / file) for file in files]
 
-        breakpoint()
         #  Apply ccdproc
         ccdred.ccdred_list(files, mbias, mflats[filt])
 
