@@ -32,7 +32,6 @@ Main goal is to work with the following instruments:
 - SAMI@SOAR
 - Goodman@SOAR (imaging mode)
 
-
 Testing and development of the software is being done through the exploration
 many aspects of a time-series dataset collected over 10 days for M11 (the
 Wild Duck cluster) using the B&C (0.6 m) and PE (1.6 m) telescopes equipped
