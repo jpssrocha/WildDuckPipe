@@ -29,7 +29,6 @@ reduction of FITS images from anywhere that can be reduced on a standard way.
 Main goal is to work with the following instruments:
 
 - CAM(1-2)@OPD
-- SPARC4@OPD (?)
 - SAMI@SOAR
 - Goodman@SOAR (imaging mode)
 
