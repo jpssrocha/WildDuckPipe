@@ -14,7 +14,6 @@ following packages (beyond the scipy stack):
 - astrometry.net
 - photutils
 
-
 The final goal is to have a pipeline framework on which will be possible
 to pass the path to the folder with the original files from an observing
 run and have back the final results (reduced images, photometry tables,
