@@ -8,6 +8,7 @@ from .file_organization import organize_nightrun, sep_by_kw
 from pathlib import Path
 from shutil import rmtree
 
+
 def initial_reduction(nightrun_folder):
     """
     Given a folder perform all the initial reduction process:
@@ -33,7 +34,7 @@ def initial_reduction(nightrun_folder):
     """
 
     print(f"Starting to process folder {nightrun_folder} \n")
-    
+
     folders = organize_nightrun(nightrun_folder)
 
     # Correcting bias and combining into master
@@ -52,7 +53,6 @@ def initial_reduction(nightrun_folder):
     for filt in folders["flat"]:
         flat_list = [str(path) for path in folders["flat"][filt].glob("*.fits")]
         mflats.update(ccdred.make_mflat(flat_list, mbias, folders["master"], filt))
-    
 
     #  Correct overscan of sci images
 
@@ -62,7 +62,6 @@ def initial_reduction(nightrun_folder):
 
     for im in sci_list:
         ccdred.correct_overscan(im)
-
 
     log_df, _ = get_log(folders["reduced"], write=False)
 
@@ -100,7 +99,7 @@ def initial_reduction(nightrun_folder):
     # Converting to path object
 
     mbias = Path(mbias)
-    
+
     for filter in mflats:
         mflats[filter] = Path(mflats[filter])
 
