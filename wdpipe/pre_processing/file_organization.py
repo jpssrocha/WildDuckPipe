@@ -14,7 +14,7 @@ def copy_files(files, destination, overwrite=False):
 
     Parameters
     ----------
-        files : List-like object with strings
+        files : List-like object with pathlib.Path objects
             List containing strings with the address of files to copy.
 
         destination : pathlib.Path object
@@ -36,7 +36,7 @@ def copy_files(files, destination, overwrite=False):
     print(f"Copying {quantity} files... \n")
 
     for i, file in enumerate(files, start=1):
-        print(f"{file} ====> {destination}/{file.split('/')[-1]} ({i} de {quantity})")
+        print(f"{file} ====> {destination}/{file.name} ({i} de {quantity})")
         dest = destination / str(file)
         if dest.exists() and not overwrite:
             print(f".Skipping {destination}: File already exists")
@@ -164,6 +164,7 @@ def organize_nightrun(folder, out_location=None):
     #  Small fix to avoid bug due to lacking \ or /
     folder.strip("\\").strip("/")
     folder = f"{folder}/"
+    folder = Path(folder)
 
     #  Create log for folder
     
@@ -176,9 +177,9 @@ def organize_nightrun(folder, out_location=None):
     
     #  Creating folder structure
     if out_location != None:
-        root = Path(f"{out_location}/r_{folder}")
+        root = Path(f"{out_location}/r_{folder.name}")
     else:
-        root = Path(f"r_{folder}")
+        root = Path(f"{folder.parent / ('r_' + folder.name)}")
     
     
     folders = {
@@ -203,18 +204,20 @@ def organize_nightrun(folder, out_location=None):
     bias = log[log["OBJECT"] == "BIAS"].index #  Index col is the filename
     flats = log[log["OBJECT"] == "FLAT"].index
     sci = log[log["COMMENT"] == "science"].index
+
+    breakpoint()
     
     print("Copying bias ...\n")
     
-    copy_files(folder +  bias, folders["bias"])
+    copy_files(folder / bias, folders["bias"])
     
     print("Copying flats ...\n")
     
-    copy_files(folder + flats, folders["flat"])
+    copy_files(folder / flats, folders["flat"])
 
     print("Copying science images ...\n")
         
-    copy_files(folder + sci, folders["reduced"])
+    copy_files(folder / sci, folders["reduced"])
     
     #   Organize flat files
     
@@ -228,7 +231,7 @@ def organize_nightrun(folder, out_location=None):
     print("Moving metadata ...\n")
     
     meta = [log_filename, summary_filename]
-    meta = list(map(str, meta))
+    # meta = list(map(str, meta))
     copy_files(meta, folders["root"])
     
     return folders

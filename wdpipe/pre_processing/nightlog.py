@@ -38,7 +38,10 @@ def get_log(folder, extra_keys=[], write=True):
     ------
 
     log_tab: DataFrame
-        Table containing information given on keys
+        Table containing information given on keys.
+
+    out : pathlib.Path object
+        Path of the file created (if write = True).
 
     File transformations
     --------------------
@@ -89,7 +92,7 @@ def get_log(folder, extra_keys=[], write=True):
     if write:
         df.to_csv(out)
 
-    return [df, str(out)]
+    return [df, out]
 
 
 def get_summary(table_file):
@@ -118,7 +121,7 @@ def get_summary(table_file):
     
     exit = exit.with_suffix(".summary")
     
-    date = table_file.split("/")[0]
+    date = str(table_file).split("/")[0]
 
     # Load table
     table = pd.read_csv(table_file)
