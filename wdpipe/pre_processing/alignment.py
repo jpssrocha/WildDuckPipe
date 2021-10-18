@@ -7,7 +7,8 @@ import astroalign
 from astropy.io import fits
 from glob import glob
 import os
-from skimage.util import img_as_float32
+from skimage.util import img_as_float64
+
 
 def align_with(image, ref_matrix, ref_file):
     """
@@ -40,21 +41,22 @@ def align_with(image, ref_matrix, ref_file):
     # Loading
 
     data = fits.getdata(image)
-    data = img_as_float32(data) # Converting to float to avoid scikitimage bug
-                              # Issue #4525
+    data = img_as_float64(data)  # Converting to float to avoid scikitimage bug
+                                 # Issue #4525
 
     header = fits.getheader(image)
-    new_image = "a" + image
+    new_image = "a_" + image
 
     # Aligning
 
-    aligned_image = astroalign.register(data, ref_matrix)
+    aligned_image, _ = astroalign.register(data, ref_matrix)
 
     # Re-write file and update header
 
     header["ALIGNED-TO"] = ref_file
 
-    fits.writeto(new_image, aligned_image, header)
+
+    fits.writeto(new_image, aligned_image.astype(np.float32), header)
     os.remove(image)
 
 def align_all_images(images_folder, ref_file=None):
@@ -87,7 +89,7 @@ def align_all_images(images_folder, ref_file=None):
     if ref_file == None:
         ref_file = images[0]
 
-    ref_image = img_as_float32(fits.getdata(ref_file))
+    ref_image = img_as_float64(fits.getdata(ref_file))
     N = len(images)
 
 
