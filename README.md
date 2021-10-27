@@ -85,7 +85,6 @@ and so on.
 - Photometry
     - Aperture photometry
     - PSF photometry
-    - Differential Image Analysis (maybe)
     - Photometric calibrations
 
 ## Analysis tools
