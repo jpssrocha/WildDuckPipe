@@ -12,7 +12,7 @@ import pandas as pd
 import photometry_with_errors as phot
 
 
-def get_catalog(ref_image, pars, nsigma=1):
+def get_catalog(ref_image, pars, nsigma=0):
     """
     Detect sources in image and create catalog of id, x_center and y_center of
     stars.
