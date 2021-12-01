@@ -30,6 +30,7 @@ def calc_ref_magnitude(time_series, n=100):
         time_series : np.ndarray
             Light curves generated using the assemble_lightcurve function.
             generated using the assemble_lightcurve function.
+
         n : int
             Size of the sample to use as reference.
 
@@ -123,6 +124,6 @@ def differential_photometry(time_series, n=100, out=None, viz=False):
     if viz:
         fig.show()
 
-    diff_ts = np.hstack([pos, ts])
+    diff_ts = np.hstack([pos, diff_ts])
 
     return ref_mags, ref_stars, diff_ts
