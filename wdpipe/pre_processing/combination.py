@@ -102,3 +102,48 @@ def combine_batches(images_folder, batches_folder="batches", out_folder="combina
     os.chdir(cwd)
 
     return new_fits
+
+
+def chunk_collection(collection, chunk_size, overlap=0):
+    """
+    Given a `collection` it will divide it into chunks of `chunk_size` with an
+    option to have an `overlap` between chunks. It will discard the chunks that
+    have an index that is out of bounds.
+
+    Arguments
+    ---------
+        collection: list like object
+            Collection to chunk.
+        chunk_size: int
+            Size of the chunks.
+        overlap: int, default=0
+            Number of element to overlap.
+    Returns
+    -------
+        chunks: list of lists
+            List containing the chunks.
+    """
+    if overlap >= chunk_size:
+        raise Exception("Block size greater or equal the overlap will generate infinite loop")
+    # Correction due to implicit subtraction on the loop
+    overlap = overlap - 1
+
+    # First element
+    indexes = [list(range(0, chunk_size))]
+
+    b = 0  # Starting b
+    while b < len(collection):
+        # Fist limit: last element of the last list minus overlap
+        a = indexes[-1][-1] - overlap
+        b = a + chunk_size  # Second limit with step size
+        # There is an implicit minus here since range goes up to b-1
+        indexes.append(list(range(a, b)))
+
+    # Filtering
+    indexes = [index for index in indexes if not len(collection) in index]
+
+    chunks = []
+    for index in indexes:
+        chunks.append([collection[i] for i in index])
+
+    return chunks
