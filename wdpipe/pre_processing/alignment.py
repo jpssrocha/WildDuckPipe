@@ -10,7 +10,7 @@ import os
 from skimage.util import img_as_float64
 
 
-def align_with(image, ref_matrix, ref_file):
+def align_with(image, ref_matrix, ref_file, max_control_points=50):
     """
     Given a FITS file it will open the file and align to the reference image
     matrix and rewrite the file.
@@ -49,7 +49,7 @@ def align_with(image, ref_matrix, ref_file):
 
     # Aligning
 
-    aligned_image, _ = astroalign.register(data, ref_matrix)
+    aligned_image, _ = astroalign.register(data, ref_matrix, max_control_points)
 
     # Re-write file and update header
 
@@ -59,7 +59,8 @@ def align_with(image, ref_matrix, ref_file):
     fits.writeto(new_image, aligned_image.astype(np.float32), header)
     os.remove(image)
 
-def align_all_images(images_folder, ref_file=None):
+
+def align_all_images(images_folder, ref_file=None, max_control_points=50):
     """
     Align all FITS stellar images to reference file. If reference file is set
     to None it uses the first image in the folder.
@@ -97,7 +98,7 @@ def align_all_images(images_folder, ref_file=None):
 
     for i, im in enumerate(images, start=1):
         print(f"Aligning: {im} ({i} of {N}).")
-        align_with(im, ref_image, ref_file)
+        align_with(im, ref_image, ref_file, max_control_points)
 
     print(f"\n Finished alignment of {images_folder} images.")
 
