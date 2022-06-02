@@ -26,7 +26,7 @@ import pandas as pd
 from astropy.modeling.models import Moffat1D
 from astropy.modeling.fitting import LevMarLSQFitter
 
-from photutils import centroid_1dg
+from photutils.centroids import centroid_1dg
 
 from astropy.io import fits
 
