@@ -405,7 +405,7 @@ def ccdred_list(image_path_list, mbias_path, mflat_path):
                     oscan = biassec,
                     trim = trimsec,
                     master_bias = mbias_ccd,
-                    master_flat = mbias_ccd
+                    master_flat = mflat_ccd
                     )
 
             ##  Can add more information on the function above for the pixel by
