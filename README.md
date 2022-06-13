@@ -27,9 +27,8 @@ reduction of FITS images from anywhere that can be reduced on a standard way.
 
 Main goal is to work with the following instruments:
 
-- CAM(1-2)@OPD
-- SAMI@SOAR
-- Goodman@SOAR (imaging mode)
+- CAM 1@OPD
+- CAM 2@OPD
 
 Testing and development of the software is being done through the exploration
 many aspects of a time-series dataset collected over 10 days for M11 (the
@@ -46,7 +45,7 @@ and so on.
 
 - Organization in folders (Done)
 - Generation of night run meta-data (Done)
-- Creation of a database using meta-data
+- Creation of a database using meta-data (Done)
 
 ## Image processing tools
 
@@ -59,49 +58,44 @@ and so on.
 - Application of calibrations (Done)
     - Bias subtraction (Done)
     - Flat normalization (Done)
-    - Iraf CCDPROC like task (re implementing using astropy's ccdproc)
+    - Iraf CCDPROC like task (Done)
 
-- Image alignment
-    - For rich fields (e.g. stellar clusters) (astroalign) (To re implement to work w/ MEF'S)
-    - For poor fields (e.g. field variable star) (IRAF's imalign like)
+- Image alignment (Done)
 
-- Image combination (To re implement using ccdproc)
+- Image combination (Done)
 
-- Automatic astrometry (astrometry.net) 
+- Automatic astrometry (via astrometry.net)  (TODO)
 
 ## Data inspection tools
 
 - Extraction of basic statistics (Done)
 
-- Robust automatic estimations (Done ?)
-    - Sky sigma
-    - FWHM (OK)
+- Semi-automatic estimations (Done)
+    - Sky sigma (Done)
+    - FWHM (Done)
 
-- Image quality visualization plots
+- Image quality visualization plots (Done)
 
 
 ## Data reduction tools
 
 - Photometry
-    - Aperture photometry
+    - Aperture photometry (Done)
     - PSF photometry
     - Photometric calibrations
 
 ## Analysis tools
 
 - Light Curve
-    - Generation of artificial reference star
-    - Differential photometry
+    - Generation of artificial reference star (Done)
+    - Differential photometry (Done)
     - Variability detection
-    - Time series plot
+    - Time series plot (Done)
 
-- Color Magnitude Diagram visualization
 
 # Desired features
 
-- File organization to facilitate manual inspection
-- Fully automated pre processing of FITS files
-- Support for multi-extension files (MEF)
-- Option to use shell interface
+- File organization to facilitate manual inspection (Done)
+- Fully automated pre processing of FITS files (Done)
+- Support for multi-extension files (MEF) (Will be added on version 2)
 - Built using official astropy packages (to leverage improvements from then)
-- Organization tools to be used in a project
