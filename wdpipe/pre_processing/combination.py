@@ -73,33 +73,35 @@ def combine_batches(images_folder, batches_folder="batches", out_folder="combina
     File transformations:
         Write new FITS files for the combinations.
     """
-    cwd = os.getcwd()
-    os.chdir(images_folder)
+    with indir(images_folder):
 
-    os.mkdir(out_folder)
+        os.mkdir(out_folder)
 
-    # Load Batches
-    batches = []
-    for batch in os.listdir(batches_folder):
-        with open(batches_folder + "/" + batch) as f:
-            batches.append([line.strip() for line in f])
+        # Load Batches
+        batches = []
+        files = os.listdir(batches_folder)
+        files.sort()
 
-    # Define new stem name
-    ref_file = batches[0][0].split("_")
-    stem = f"final_{ref_file[1]}_{ref_file[2]}"
-    N = len(batches)
+        for batch in files:
+            with open(batches_folder + "/" + batch) as f:
+                batches.append([line.strip() for line in f])
 
-    # For each batch combine_batch them save results
-    for i, batch in enumerate(batches, start=1):
-        new_name = f"{stem}_{i:04}"
-        print(f"Creating image: {new_name} ({i} de {N})")
-        matrix, new_header = combine_batch(batch, new_name)
-        fits.writeto(f"{out_folder}/{new_name}.fits", matrix.astype(np.float32), header=new_header)
+        # Define new stem name
+        ref_file = batches[0][0].split("_")
+        stem = f"final_{ref_file[1]}_{ref_file[2]}"
+        N = len(batches)
 
-    new_fits = os.listdir(f"{images_folder}/{out_folder}")
-    new_fits.sort()
+        # For each batch combine_batch them save results
+        for i, batch in enumerate(batches, start=1):
+            new_name = f"{stem}_{i:04}"
+            print(f"Combining batch: {batch}")
+            print(f"Creating image: {new_name} ({i} de {N})")
+            matrix, new_header = combine_batch(batch, new_name)
+            fits.writeto(f"{out_folder}/{new_name}.fits", matrix.astype(np.float32), header=new_header)
 
-    os.chdir(cwd)
+        new_fits = os.listdir(f"{images_folder}/{out_folder}")
+        new_fits.sort()
+
 
     return new_fits
 
