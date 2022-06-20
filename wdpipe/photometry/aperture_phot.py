@@ -5,14 +5,16 @@ import os
 from glob import glob
 
 import numpy as np
+import pandas as pd
 from astropy.io import fits
 from photutils import DAOStarFinder
 from photutils import CircularAnnulus, CircularAperture
-import pandas as pd
+
+from wdpipe.utils.context_managers import indir
 import photometry_with_errors as phot
 
 
-def get_catalog(ref_image, pars, nsigma=0):
+def get_catalog(ref_image, pars, nsigma=5):
     """
     Detect sources in image and create catalog of id, x_center and y_center of
     stars.
@@ -25,6 +27,7 @@ def get_catalog(ref_image, pars, nsigma=0):
 
     Return:
         positions -- 2D numpy array with catalog (Columns: 0 - ID; 1 - Xcenter; 2 - Ycenter)
+        sources -- Table containing the source properties
     """
 
     matrix = fits.getdata(ref_image)
@@ -39,14 +42,14 @@ def get_catalog(ref_image, pars, nsigma=0):
         sources["xcentroid"],
         sources["ycentroid"]))
 
-    return positions
+    return positions, sources
 
 
 def get_photometry(
         image,
         catalog,
         pars,
-        aperture_factors={"r": 1.5, "r_in": 2.5, "r_out": 3.5},
+        aperture_factors={"r": 2.0, "r_in": 2.5, "r_out": 3.5},
         zero_point=25,
         first=False):
     """
@@ -71,7 +74,7 @@ def get_photometry(
     header = fits.getheader(image)
     fwhm = pars["FWHM"]
     positions = catalog[:, 1:]
-    indexes = catalog[:, 1][:, None]
+    indexes = catalog[:, 0][:, None]
 
     #  Create apertures
     apertures = CircularAperture(positions,
@@ -121,33 +124,34 @@ def assemble_lightcurve(
 
     """
 
-    cwd = os.getcwd()
-    os.chdir(image_folder)
-    images = glob("*.fits")
-    images.sort()
     pars = pd.read_csv(pars_ds, index_col="file")
 
-    print(f"Starting to assemble time series table of images on {image_folder}")
+    with indir(image_folder):
 
-    light_curve = get_photometry(images[0],
-                                 catalog,
-                                 pars.loc[images[0]],
-                                 aperture_factors=aperture_factors,
-                                 first=True)
+        images = glob("*.fits")
+        images.sort()
 
-    images = images[1:]
-    N = len(images)
 
-    for i, im in enumerate(images, start=1):
-        print(f"Doing photometry of {im} ... ({i} of {N})")
-        light_curve = np.hstack([light_curve,
-                                 get_photometry(im,
-                                                catalog,
-                                                pars.loc[im],
-                                                aperture_factors=aperture_factors)])
+        print(f"Starting to assemble time series table of images on {image_folder}")
 
-    print("Finished Photometry.")
 
-    os.chdir(cwd)
+        light_curve = get_photometry(images[0],
+                                     catalog,
+                                     pars.loc[images[0]],
+                                     aperture_factors=aperture_factors,
+                                     first=True)
+
+        images = images[1:]
+        N = len(images)
+
+        for i, im in enumerate(images, start=1):
+            print(f"Doing photometry of {im} ... ({i} of {N})")
+            light_curve = np.hstack([light_curve,
+                                     get_photometry(im,
+                                                    catalog,
+                                                    pars.loc[im],
+                                                    aperture_factors=aperture_factors)])
+
+        print("Finished Photometry.")
 
     return light_curve
