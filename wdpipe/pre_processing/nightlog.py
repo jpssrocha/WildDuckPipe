@@ -17,7 +17,7 @@ import pandas as pd
 import os
 from pathlib import Path
 
-def get_log(folder, extra_keys=[], write=True):
+def get_log(folder, extra_keys=[], write=False):
     """
     Given a folder, it generate a log file with the listing of the keys given
     on the keys parameter. Default are the keys from OPD.
