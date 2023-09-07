@@ -19,20 +19,20 @@ OBS:
     it is a star or sky (categorical "star" or "sky") and x,y are the central
     pixel coordinate (integers with pixel positions)
 """
+import os
+from glob import glob
+
 
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from astropy.modeling.models import Moffat1D
 from astropy.modeling.fitting import LevMarLSQFitter
-
+from astropy.io import fits
 from photutils.centroids import centroid_1dg
 
-from astropy.io import fits
 
-import os
-from glob import glob
-
+from wdpipe.utils.context_managers import indir
 
 def get_stats(img_matrix, take=["min", "max", "mean", "median", "std"]):
     """
@@ -230,21 +230,19 @@ def get_parameters_all(folder, ref_stars_x, ref_stars_y, ref_sky_x, ref_sky_y):
     Return:
         Pandas Dataframe containing information on all fits files of the folder
     """
-    cur_dir = os.getcwd()
-    os.chdir(folder)
-    print(os.getcwd())
-    files = glob("*.fits")
-    files.sort()
+    with indir(folder):
 
-    N = len(files)
+        files = glob("*.fits")
+        files.sort()
 
-    dicts = []
-    for i, image in enumerate(files, start=1):
-        print(f"Getting parameters for file: {image} ({i} of {N})")
-        dicts.append(get_image_parameters(image, ref_stars_x, ref_stars_y, ref_sky_x, ref_sky_y))
+        N = len(files)
 
-    df = pd.DataFrame(dicts)
-    os.chdir(cur_dir)
+        dicts = []
+        for i, image in enumerate(files, start=1):
+            print(f"Getting parameters for file: {image} ({i} of {N})")
+            dicts.append(get_image_parameters(image, ref_stars_x, ref_stars_y, ref_sky_x, ref_sky_y))
+
+        df = pd.DataFrame(dicts)
 
     print("\nFinished getting parameters!")
 
