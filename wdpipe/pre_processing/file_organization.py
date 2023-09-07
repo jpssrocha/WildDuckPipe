@@ -1,12 +1,13 @@
 """Functions to help organize files using the log file
 
 """
-import pandas as pd
-from pathlib import Path
 import os
+from shutil import copyfile, move
+from pathlib import Path
+
 from . import nightlog
 from ..utils.context_managers import indir
-from shutil import copyfile, move
+
 
 def copy_files(files, destination, overwrite=False):
     """
@@ -170,7 +171,7 @@ def organize_nightrun(folder, out_location=None):
     
     print(f"Getting log for {folder} ... \n")
     
-    log, log_filename = nightlog.get_log(folder)
+    log, log_filename = nightlog.get_log(folder, write=True)
     
     summary_filename = nightlog.get_summary(log_filename)
 
@@ -205,8 +206,6 @@ def organize_nightrun(folder, out_location=None):
     flats = log[log["OBJECT"] == "FLAT"].index
     sci = log[log["COMMENT"] == "science"].index
 
-    breakpoint()
-    
     print("Copying bias ...\n")
     
     copy_files(folder / bias, folders["bias"])
@@ -235,3 +234,50 @@ def organize_nightrun(folder, out_location=None):
     copy_files(meta, folders["root"])
     
     return folders
+
+
+def move_lacking_fits(on_folder, fits_list, to_folder):
+    """
+    Given a folder, a list of FITS files on that folder and a folder on which
+    to move files. Get the FITS on that folder and move those who aren't on the
+    `fits_list`.
+    
+    obs: the to_folder path has to be relative to the on_folder
+
+    Parameters
+    ----------
+        on_folder: str
+            Folder to look for fits files
+
+        fits_list: list of str
+            List of FITS files to maintain
+
+        to_folder: str
+            Folder on which to move files relative to the `on_folder`.
+    
+    Returns
+    -------
+        none
+    """
+    from glob import glob
+    from os.path import exists
+
+    
+    # Go to that folder
+    with indir(on_folder):
+        
+        # Get all FITS
+        all_fits = glob("*.fits")
+        all_fits.sort()
+        
+        if not exists(to_folder):
+            os.mkdir(to_folder)
+        
+        # Get lacking FITS
+        lacking_fits = [file_ for file_ in all_fits if file_ not in list(fits_list)]
+        
+        print(f"Moving {len(lacking_fits)} FITS files from {len(all_fits)}")
+        
+        # Move lacking FITS
+        move_files(lacking_fits, to_folder)
+        
