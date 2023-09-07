@@ -1,7 +1,6 @@
 """
 Functions to perform aperture photometry over a folder of FITS files.
 """
-import os
 from glob import glob
 
 import numpy as np
@@ -11,7 +10,8 @@ from photutils import DAOStarFinder
 from photutils import CircularAnnulus, CircularAperture
 
 from wdpipe.utils.context_managers import indir
-import photometry_with_errors as phot
+import wfc3_photometry.photometry_tools.photometry_with_errors as phot
+
 
 
 def get_catalog(ref_image, pars, nsigma=5):

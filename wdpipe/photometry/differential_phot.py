@@ -16,7 +16,7 @@ def convert_to_magnitude(x):
     return -2.512*np.log10(x)
 
 
-def calc_ref_magnitude(time_series, n=100):
+def calc_ref_magnitude(time_series, n=10):
     """
     From time series table (generated with assemble_lightcurve) get the `n`
     stars with the lowest std along the time series to generate reference
@@ -109,7 +109,7 @@ def differential_photometry(time_series, n=100, out=None, viz=False):
 
     fig, ax = plt.subplots()
 
-    ax.scatter(means, stds, s=1, alpha=.5)
+    ax.scatter(means, stds, s=20, alpha=.5)
     ax.set_xlim(-2, 6)
     ax.set_ylim(0, .2)
     ax.set_title("Magnitude diferencial média por desvio padrão (banda V)")
@@ -127,3 +127,6 @@ def differential_photometry(time_series, n=100, out=None, viz=False):
     diff_ts = np.hstack([pos, diff_ts])
 
     return ref_mags, ref_stars, diff_ts
+
+def targeted_differential_photometry():
+    pass
