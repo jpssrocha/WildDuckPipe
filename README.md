@@ -14,6 +14,11 @@ following packages (beyond the scipy stack):
 - astrometry.net
 - photutils
 
+To work with the aperture photometry is also leveraged the code at:
+
+> https://github.com/spacetelescope/wfc3_photometry/tree/master
+
+
 The final goal is to have a pipeline framework on which will be possible
 to pass the path to the folder with the original files from an observing
 run and have back the final results (reduced images, photometry tables,
