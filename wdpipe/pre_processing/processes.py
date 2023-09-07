@@ -9,7 +9,7 @@ from pathlib import Path
 from shutil import rmtree
 
 
-def initial_reduction(nightrun_folder):
+def initial_reduction(nightrun_folder, out_location=None):
     """
     Given a folder perform all the initial reduction process:
         - Organize files
@@ -21,6 +21,11 @@ def initial_reduction(nightrun_folder):
     ----------
         nightrun_folder : str
             Path to the folder to reduce
+
+        out_location : str or None 
+            Path to folder on which to create the reduction folder. Default
+            is None, it creates the reduction folder on the same directory
+            of the original.
 
     File transformations
     --------------------
@@ -35,7 +40,7 @@ def initial_reduction(nightrun_folder):
 
     print(f"Starting to process folder {nightrun_folder} \n")
 
-    folders = organize_nightrun(nightrun_folder)
+    folders = organize_nightrun(nightrun_folder, out_location=out_location)
 
     # Correcting bias and combining into master
 
@@ -77,7 +82,12 @@ def initial_reduction(nightrun_folder):
         files = [str(folders["reduced"] / file) for file in files]
 
         #  Apply ccdproc
-        ccdred.ccdred_list(files, mbias, mflats[filt])
+        if filt in mflats:
+            ccdred.ccdred_list(files, mbias, mflats[filt])
+
+        else:
+            print(f"WARNING: No flat available for {filt} filter.")
+
 
     # Organize final results
     log_df, _ = get_log(folders["reduced"], write=False)
