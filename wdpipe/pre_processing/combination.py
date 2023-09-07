@@ -5,6 +5,122 @@ import numpy as np
 from astropy.io import fits
 import os
 
+from wdpipe.utils.context_managers import indir
+
+
+def group_images(final_selection, exptime, n=5):
+    """
+    Given a final selection dataframe (a filtered inspection dataframe
+    generated with the function `.inspection.inspect`) and the exposure time of
+    the images, separate images into blocks that are separated by `n*exptime`
+    units of time.
+    
+    Parameters
+    ----------
+        final_selection: pd.DataFrame
+            Parameters dataframe of the final data selection.
+                
+        exptime: float
+            Exposure time in seconds.
+            
+        n: int, default: 5
+            number of exposure times of separation in time to define an
+            observation block.
+            
+    Returns
+    -------
+        group_list: list of lists
+            Return list containing lists of filenames that represents an
+            observation block.
+    """
+    # Set delta
+    delta_jd = exptime/(24*60*60)
+    
+    # Find places to break
+    break_mask = final_selection.jd.diff() > n*delta_jd
+    
+    # Find indexes of break points
+    ind = np.where(break_mask)[0]
+    indexes = np.concatenate(([0], ind, [len(final_selection)]))
+    
+    # Loop over indexes and select blocks
+    groups = []
+    lens = []
+    for i in range(len(indexes) - 1):
+        len_ = len(final_selection.iloc[indexes[i]:indexes[i+1]])
+        lens.append(len_)
+
+        if len_ > 1:
+            groups.append(final_selection.iloc[indexes[i]:indexes[i+1]])
+        else:
+            print("Escaping group of 1 image")
+        
+    print(f"Group sizes: {lens}")
+        
+    if sum(lens) != len(final_selection):
+        raise Exception("Groups aren't summing up to the lenght of the selection. Review the data.")
+    
+    return groups
+
+
+def generate_combination_bins(data_folder, final_selection, exptime, bin_size, overlap, n=5):
+    """
+    Calculate combination bins and generate a file for each combination bin in
+    a given folder.
+
+    The files will be on a folder called `bins` inside the `data_folder`.
+    
+    Parameters
+    ----------
+        data_folder: str
+            Path to the data
+
+        final_selection: pd.DataFrame
+            Parameters dataframe of the final data selection.
+                
+        exptime: float
+            Exposure time in seconds.
+
+        bin_size: int
+            Desired size for the bins.
+
+        overlap: int
+            Amount of overlap between images.
+            
+        n: int, default: 5
+            number of exposure times of separation in time to define an
+            observation block.
+
+    File transformations
+    --------------------
+        Create a folder called `bins` and fill it with one file with each
+        combination of files.
+            
+    Returns
+    -------
+        bins: list of lists
+            Return list containing lists of filenames that represents
+            combination bin.
+    """
+    
+    blocks = group_images(final_selection, exptime, n=n)
+    
+    with indir(data_folder):
+        
+        if not os.path.exists("bins"):
+            os.mkdir("bins")
+        
+        for i, block in enumerate(blocks, start=1):
+            index_chunks = chunk_collection(block.index, bin_size, overlap=overlap)
+            usable_index_chunks = [chunk for chunk in index_chunks if len(chunk) == bin_size]
+
+            for j, chunk in enumerate(usable_index_chunks, start=1):
+                (final_selection.loc[chunk].
+                 file.
+                 to_csv(f"bins/group-{i:04}_bin-{j:04}.txt", header=False, index=False))
+            
+    return usable_index_chunks
+
 
 def combine_batch(batch, update_name):
     """
