@@ -41,7 +41,7 @@ def copy_files(files, destination, overwrite=False):
         dest = destination / str(file)
         if dest.exists() and not overwrite:
             print(f".Skipping {destination}: File already exists")
-            pass
+            continue
         copyfile(file, destination / str(file).split("/")[-1])
     print("\n")
 
