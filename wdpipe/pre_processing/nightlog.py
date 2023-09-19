@@ -59,7 +59,7 @@ def get_log(folder, extra_keys=[], write=False):
         print("ERROR: No files found, can't create log dataframe for orientation. Returning None")
         return None
 
-    out = out / f"{str(out)}_night.log"
+    out_file = out / f"{str(out)}_night.log"
 
     keys = ["DATE-OBS", "OBJECT", "FILTER", 
             "EXPTIME", "AIRMASS", "COMMENT"]
@@ -90,9 +90,9 @@ def get_log(folder, extra_keys=[], write=False):
         df[key] = df[key].apply(cleaners[key])
 
     if write:
-        df.to_csv(out)
+        df.to_csv(out_file)
 
-    return [df, out]
+    return df, out_file
 
 
 def get_summary(table_file):
