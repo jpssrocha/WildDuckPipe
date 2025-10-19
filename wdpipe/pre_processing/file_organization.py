@@ -38,11 +38,14 @@ def copy_files(files, destination, overwrite=False):
 
     for i, file in enumerate(files, start=1):
         print(f"{file} ====> {destination}/{file.name} ({i} de {quantity})")
-        dest = destination / str(file)
+
+        dest = destination / file.name        
+
         if dest.exists() and not overwrite:
-            print(f".Skipping {destination}: File already exists")
+            print(f".Skipping {dest}: File already exists")
             continue
-        copyfile(file, destination / str(file).split("/")[-1])
+        
+        copyfile(file, destination / file.name)
     print("\n")
 
 
