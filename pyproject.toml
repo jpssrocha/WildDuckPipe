@@ -1,0 +1,15 @@
+[project]
+name = "wildduckpipe"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "astroalign>=2.6.2",
+    "astropy>=7.1.0",
+    "ccdproc>=2.5.1",
+    "marimo>=0.17.0",
+    "matplotlib>=3.10.7",
+    "pandas>=2.3.3",
+    "photutils>=2.3.0",
+]
