@@ -110,11 +110,11 @@ def align_all_images(
 
         for i, im in enumerate(images, start=1):
             if "a_" not in im:
-                try:
-                    print(f"Aligning: {im} ({i} of {N}).")
-                    align_with(im, ref_image, ref_file, max_control_points=max_control_points, min_area=min_area)
-                except:
-                    print(f"Some problem has happened with the alignment of image {im}")
-                    continue
+                # try:
+                print(f"Aligning: {im} ({i} of {N}).")
+                align_with(im, ref_image, ref_file, max_control_points=max_control_points, min_area=min_area)
+                # except:
+                #     print(f"Some problem has happened with the alignment of image {im}")
+                #     continue
 
         print(f"\n Finished alignment of {images_folder} images.")
