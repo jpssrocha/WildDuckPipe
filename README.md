@@ -1,6 +1,6 @@
 # Wild Duck Pipe
 
-**Project archived: Went to work on a more flexible pipeline with support for 
+**Project terminated: Went to work on a more flexible pipeline with support for 
 flexible input, this project will work only for OPD-LNA telescopes with the 
 correct conventions from `docs/dev/design_doc.md`**
 
