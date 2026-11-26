@@ -1367,10 +1367,16 @@ dependencies = [
     { name = "astroalign" },
     { name = "astropy" },
     { name = "ccdproc" },
-    { name = "marimo" },
     { name = "matplotlib" },
+    { name = "numpy" },
     { name = "pandas" },
     { name = "photutils" },
+    { name = "scikit-image" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "marimo" },
 ]
 
 [package.metadata]
@@ -1378,11 +1384,15 @@ requires-dist = [
     { name = "astroalign", specifier = ">=2.6.2" },
     { name = "astropy", specifier = ">=7.1.0" },
     { name = "ccdproc", specifier = ">=2.5.1" },
-    { name = "marimo", specifier = ">=0.17.0" },
     { name = "matplotlib", specifier = ">=3.10.7" },
+    { name = "numpy", specifier = ">=2.3.3" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "photutils", specifier = ">=2.3.0" },
+    { name = "scikit-image", specifier = ">=0.25.2" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "marimo", specifier = ">=0.17.0" }]
 
 [[package]]
 name = "zarr"

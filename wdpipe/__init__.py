@@ -1,6 +1,9 @@
-"""Tools for data reduction within the wild duck project
+"""Tools for CCD image reduction and time-series photometry.
 
-Sub-Packages:
-    inspection -- Functions to inspect data
-    reduction -- Functions to perform basic reductions on FITS files
+Sub-packages:
+    pre_processing -- File organization, calibration, alignment, combination
+    inspection     -- Image statistics, sky/FWHM estimates, quality filtering
+    photometry     -- Aperture and differential photometry
+    astrometry     -- WCS-based coordinate annotation
+    utils          -- Shared helpers
 """

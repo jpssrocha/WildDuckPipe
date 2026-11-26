@@ -1,4 +1,24 @@
-__pycache__
-.venv
-*egg-info
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
 
+# Jupyter / marimo
+.ipynb_checkpoints/
+.marimo/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local configuration, data, and optional third-party checkouts
+.env
+data/
+third_party/
+
+# OS
+.DS_Store

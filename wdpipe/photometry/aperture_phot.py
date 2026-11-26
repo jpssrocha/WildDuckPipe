@@ -6,12 +6,16 @@ from glob import glob
 import numpy as np
 import pandas as pd
 from astropy.io import fits
-from photutils import DAOStarFinder
-from photutils import CircularAnnulus, CircularAperture
+from photutils.aperture import CircularAnnulus, CircularAperture
+from photutils.detection import DAOStarFinder
 
 from wdpipe.utils.context_managers import indir
-import wfc3_photometry.photometry_tools.photometry_with_errors as phot
 
+try:
+    import wfc3_photometry.photometry_tools.photometry_with_errors as phot
+except ImportError as exc:  # Optional, unpackaged dependency.
+    phot = None
+    _WFC3_IMPORT_ERROR = exc
 
 
 def get_catalog(ref_image, pars, nsigma=5):
@@ -56,7 +60,7 @@ def get_photometry(
     Use catalog to generate photometry table.
 
     Args:
-        ref_image -- String with path to reference image.
+        image -- String with path to reference image.
         catalog -- 2D numpy array with table created with get_catalog.
         pars -- Pandas Series with image parameters.
         aperture_factors -- Dict with factors to scale apertures in units of FWHM.
@@ -68,6 +72,16 @@ def get_photometry(
     Return:
         Numpy 2D array with table of photometry.
     """
+
+    if phot is None:
+        raise ImportError(
+            "Aperture photometry requires the `wfc3_photometry` package, which "
+            "is not distributed on PyPI. Clone "
+            "https://github.com/spacetelescope/wfc3_photometry into "
+            "`third_party/wfc3_photometry` and add `third_party` to "
+            "PYTHONPATH. Upstream targets photutils < 2, so apply the "
+            "compatibility patch described in the README for photutils 2.x."
+        ) from _WFC3_IMPORT_ERROR
 
     #  Load data
     matrix = fits.getdata(image)

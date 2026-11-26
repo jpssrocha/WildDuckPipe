@@ -1,15 +1,48 @@
 [project]
 name = "wildduckpipe"
 version = "0.1.0"
-description = "Add your description here"
+description = "CCD image-reduction and time-series photometry pipeline for OPD/LNA observations."
 readme = "README.md"
 requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+    { name = "João Pedro Rocha" },
+]
+keywords = [
+    "astronomy",
+    "astrophysics",
+    "ccd",
+    "fits",
+    "image-reduction",
+    "photometry",
+    "pipeline",
+]
+classifiers = [
+    "Development Status :: 7 - Inactive",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
 dependencies = [
     "astroalign>=2.6.2",
     "astropy>=7.1.0",
     "ccdproc>=2.5.1",
-    "marimo>=0.17.0",
     "matplotlib>=3.10.7",
+    "numpy>=2.3.3",
     "pandas>=2.3.3",
     "photutils>=2.3.0",
+    "scikit-image>=0.25.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/jpssrocha/WildDuckPipe"
+Repository = "https://github.com/jpssrocha/WildDuckPipe"
+Issues = "https://github.com/jpssrocha/WildDuckPipe/issues"
+
+[dependency-groups]
+dev = [
+    "marimo>=0.17.0",
 ]

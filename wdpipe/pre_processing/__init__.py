@@ -1,5 +1,1 @@
-"""Modules related to the reduction process
-
-DEPRECATED !!! 
-
-"""
+"""Pre-processing modules: organization, calibration, alignment, combination."""
